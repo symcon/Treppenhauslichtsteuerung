@@ -1,0 +1,8 @@
+{
+    "elements":
+    [
+        { "type": "SelectVariable", "name": "InputTriggerID", "caption": "Input Sensor" },
+        { "type": "NumberSpinner", "name": "Duration", "caption": "Duration", "suffix": "minutes"},
+        { "type": "SelectVariable", "name": "OutputID", "caption": "Output Variable" }
+    ]
+}

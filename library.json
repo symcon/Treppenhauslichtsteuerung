@@ -1,0 +1,12 @@
+{
+	"id": "{D793B1C0-2C13-451F-9685-2272B2A5B8E8}",
+	"author": "Symcon GmbH",
+	"name": "Treppenhauslichtsteuerung",
+	"url": "www.symcon.de",
+	"compatibility": {
+		"version": "4.2"
+	},
+	"version": "1.0",
+	"build": 0,
+	"date": 0
+}
