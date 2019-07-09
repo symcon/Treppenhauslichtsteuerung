@@ -49,9 +49,21 @@
             if (!GetValue($this->GetIDForIdent("Active"))){
                 return;
             }
-            $duration = $this->ReadPropertyInteger("Duration");
 
-            $this->SwitchVariable(true);
+            $triggerID = $this->ReadPropertyInteger("InputTriggerID");
+            $outputID = $this->ReadPropertyInteger("OutputID");
+
+            //If InputTriggerID and TargetID are the same we need to check if switching is required
+            //Otherwise it will result in an endless loop
+            if($triggerID == $outputID) {
+                if(!GetValue($outputID)) {
+                    $this->SwitchVariable(true);
+                }
+            } else {
+                $this->SwitchVariable(true);
+            }
+
+            $duration = $this->ReadPropertyInteger("Duration");
             $this->SetTimerInterval("OffTimer", $duration * 60 * 1000);
         }
 
