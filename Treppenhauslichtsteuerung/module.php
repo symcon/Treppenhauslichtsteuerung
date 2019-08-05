@@ -74,8 +74,6 @@
 
         private function SwitchVariable(bool $Value){
             $outputID = $this->ReadPropertyInteger("OutputID");
-
-            $object = IPS_GetObject($outputID);
             $variable = IPS_GetVariable($outputID);
 
             $actionID = $this->GetProfileAction($variable);
@@ -104,10 +102,7 @@
                 $actionValue = $Value;
             }
 
-            if(IPS_InstanceExists($actionID)){
-                IPS_RequestAction($actionID, $object['ObjectIdent'], $actionValue);
-            } else if(IPS_ScriptExists($actionID)) {
-                echo IPS_RunScriptWaitEx($actionID, Array("VARIABLE" => $outputID, "VALUE" => $actionValue));
+                RequestAction($outputID, $actionValue);                                       
             }
         }
 
