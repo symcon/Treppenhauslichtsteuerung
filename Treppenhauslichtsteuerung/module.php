@@ -73,9 +73,9 @@
         }
 
         private function SwitchVariable(bool $Value){
+            
             $outputID = $this->ReadPropertyInteger("OutputID");
             $variable = IPS_GetVariable($outputID);
-
             $actionID = $this->GetProfileAction($variable);
 
             //Quit if actionID is not a valid target
@@ -84,23 +84,31 @@
                 return;
             }
 
-            $profileName = $this->GetProfileName($variable);
-
-            //If we somehow do not have a profile take care that we do not fail immediately
-            if($profileName != "") {
-                //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
-                if ($Value) {
-                    $actionValue = IPS_GetVariableProfile($profileName)['MaxValue'];
-                } else {
-                    $actionValue = 0;
-                }
-                //Reduce to boolean if required
-                if($variable['VariableType'] == 0) {
-                    $actionValue = ($actionValue > 0);
-                }
+            if (IPS_GetVariable["VariableType"] == 0 ) {
+                RequestAction($outputID, $Value);
             } else {
-                $actionValue = $Value;
-            }
+                $profileName = $this->GetProfileName($variable);
+                //Quit if output variable has no profile
+                if (!IPS_VariableProfileExists($profileName)) {
+                    echo $this->Translate("The output variable of the Treppenhauslichtsteuerung has no variable profile. Please choose a variable with a variable profile or add a variable profile to the output variable.");
+                    return;
+                }
+                $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
+                $minValue = IPS_GetVariableProfile($profileName)['MinValue'];
+
+                //Quit if min is greater than max value
+                if ($maxValue - $minValue <= 0) {
+                    echo $this->Translate("The profile of the output variable has no defined max value. Please update the max value or choose another profile.");
+                    return;
+                } 
+                                  
+                //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
+                $actionValue = 0;
+                if ($Value) {
+                    $actionValue = $maxValue;
+                } else {
+                    $actionValue = $minValue;
+                }
 
                 RequestAction($outputID, $actionValue);                                       
             }
@@ -122,4 +130,3 @@
             }
         }
     }
-?>
