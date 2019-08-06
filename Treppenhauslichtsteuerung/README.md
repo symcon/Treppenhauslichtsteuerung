@@ -19,7 +19,7 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird das
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 4.x
+- IP-Symcon ab Version 5.0
 
 ### 3. Software-Installation
 
