@@ -22,6 +22,14 @@ class Treppenhauslichtsteuerung extends IPSModule
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
 
         $this->RegisterMessage($triggerID, 10603 /* VM_UPDATE */);
+    
+        $outputID = $this->ReadPropertyInteger("OutputID");
+            
+        if (IPS_GetVariable($outputID)["VariableType"] == 3) {
+            $this->SetStatus(200);
+        } else {
+            $this->SetStatus(102);
+        }    
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -52,6 +60,10 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function Start()
     {
         if (!GetValue($this->GetIDForIdent("Active"))) {
+            return;
+        }
+
+        if ($this->GetStatus() != 102) {
             return;
         }
 
@@ -91,7 +103,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             return;
         }
 
-        if (IPS_GetVariable["VariableType"] == 0) {
+        if (IPS_GetVariable($outputID)["VariableType"] == 0) {
             RequestAction($outputID, $Value);
         } else {
             $profileName = $this->GetProfileName($variable);
