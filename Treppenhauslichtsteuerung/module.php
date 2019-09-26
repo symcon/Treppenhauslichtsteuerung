@@ -79,7 +79,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             return;
         }
 
-        if ($this->GetStatus() != 102) {
+        if ($this->GetStatus() != IS_ACTIVE) {
             return;
         }
 
