@@ -15,24 +15,39 @@ class Treppenhauslichtsteuerung extends IPSModule
     }
 
     public function ApplyChanges()
-    {
+{
         //Never delete this line!
         parent::ApplyChanges();
 
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-
-        $this->RegisterMessage($triggerID, VM_UPDATE);
+        if(IPS_VariableExists($triggerID)) {
+            //Deactivate instance if output variable is not from type boolean 
+            if (IPS_GetVariable($triggerID)["VariableType"] != 0) {
+                //Setting the instance in error condition
+                $this->SetStatus(202);
+            } else {
+                //Setting the instance in active condition
+                $this->SetStatus(102);
+                $this->RegisterMessage($triggerID, VM_UPDATE);
+            }  
+        } else {
+            //Setting the instance in error condition
+            $this->SetStatus(203);
+        }
     
         $outputID = $this->ReadPropertyInteger("OutputID");
-        if(IPS_VariableExists($outputID)) {
+        if(IPS_VariableExists($outputID) && $this->GetStatus() == 102) {
             //Deactivate instance if output variable is from type string 
             if (IPS_GetVariable($outputID)["VariableType"] == 3) {
                 //Setting the instance in error condition
                 $this->SetStatus(200);
             } else {
-                //Setting the instance in active
+                //Setting the instance in active condition
                 $this->SetStatus(102);
             }  
+        } elseif ($this->GetStatus() == 102) {
+            //Setting the instance in error condition
+            $this->SetStatus(201);
         }
           
     }
@@ -40,7 +55,7 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-        if (($SenderID == $triggerID) && ($Message == VM_UPDATE) && (boolval($Data[0]))) {
+        if (($SenderID == $triggerID) && ($Message == VM_UPDATE)) {
             $this->Start();
         }
     }
