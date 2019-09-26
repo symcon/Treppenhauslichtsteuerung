@@ -21,13 +21,16 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
 
-        $this->RegisterMessage($triggerID, 10603 /* VM_UPDATE */);
+        $this->RegisterMessage($triggerID, VM_UPDATE);
     
         $outputID = $this->ReadPropertyInteger("OutputID");
             
+        //Deactivate instance if output variable is from type string 
         if (IPS_GetVariable($outputID)["VariableType"] == 3) {
+            //Setting the instance in error condition
             $this->SetStatus(200);
         } else {
+            //Setting the instance in active
             $this->SetStatus(102);
         }    
     }
@@ -35,7 +38,7 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-        if (($SenderID == $triggerID) && ($Message == 10603) && (boolval($Data[0]))) {
+        if (($SenderID == $triggerID) && ($Message == VM_UPDATE) && (boolval($Data[0]))) {
             $this->Start();
         }
     }
