@@ -12,7 +12,7 @@
             "The selected output-variable does not exist.": "Die ausgewählte Ausgabevariable existiert nicht.",
             "The selected input sensor is not from type boolean. Please select a boolean variable.": "Der ausgewählte Eingabesensor ist nicht vom Typ boolean. Bitte wählen Sie eine boolesche Variable aus.",
             "The selected input sensor does not exist." : "Der ausgewählte Eingabesensor existiert nicht.",
-            "There are not all variables set.": "Es sind nicht alle Variablen gesetzt"
+            "There are not all variables set.": "Es sind nicht alle Variablen gesetzt."
         }
     }
 }
