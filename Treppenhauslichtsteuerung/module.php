@@ -1,4 +1,6 @@
-<?
+<?php
+
+declare(strict_types=1);
 class Treppenhauslichtsteuerung extends IPSModule
 {
     public function Create()
@@ -6,51 +8,50 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Never delete this line!
         parent::Create();
 
-        $this->RegisterPropertyInteger("InputTriggerID", 0);
-        $this->RegisterPropertyInteger("Duration", 1);
-        $this->RegisterPropertyInteger("OutputID", 0);
-        $this->RegisterTimer("OffTimer", 0, "THL_Stop(\$_IPS['TARGET']);");
-        $this->RegisterVariableBoolean("Active", "Treppenhauslichtsteuerung aktiv", "~Switch");
-        $this->EnableAction("Active");
+        $this->RegisterPropertyInteger('InputTriggerID', 0);
+        $this->RegisterPropertyInteger('Duration', 1);
+        $this->RegisterPropertyInteger('OutputID', 0);
+        $this->RegisterTimer('OffTimer', 0, "THL_Stop(\$_IPS['TARGET']);");
+        $this->RegisterVariableBoolean('Active', 'Treppenhauslichtsteuerung aktiv', '~Switch');
+        $this->EnableAction('Active');
     }
 
     public function ApplyChanges()
-{
+    {
         //Never delete this line!
         parent::ApplyChanges();
 
-        $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-        if(IPS_VariableExists($triggerID)) {
+        $triggerID = $this->ReadPropertyInteger('InputTriggerID');
+        if (IPS_VariableExists($triggerID)) {
             $this->RegisterMessage($triggerID, VM_UPDATE);
             $this->SetStatus(IS_ACTIVE);
         } else {
-            if($triggerID == 0) {
+            if ($triggerID == 0) {
                 $this->SetStatus(IS_INACTIVE);
             } else {
                 $this->SetStatus(IS_EBASE + 2);
             }
         }
-    
-        $outputID = $this->ReadPropertyInteger("OutputID");
-        if(IPS_VariableExists($outputID) && $this->GetStatus() == IS_ACTIVE) {
-            if (IPS_GetVariable($outputID)["VariableType"] == VARIABLETYPE_STRING) {
+
+        $outputID = $this->ReadPropertyInteger('OutputID');
+        if (IPS_VariableExists($outputID) && $this->GetStatus() == IS_ACTIVE) {
+            if (IPS_GetVariable($outputID)['VariableType'] == VARIABLETYPE_STRING) {
                 $this->SetStatus(IS_EBASE);
             } else {
                 $this->SetStatus(IS_ACTIVE);
-            }  
+            }
         } elseif ($this->GetStatus() == IS_ACTIVE) {
-            if($outputID == 0) {
+            if ($outputID == 0) {
                 $this->SetStatus(IS_INACTIVE);
             } else {
                 $this->SetStatus(IS_EBASE + 1);
             }
         }
-          
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        $triggerID = $this->ReadPropertyInteger("InputTriggerID");
+        $triggerID = $this->ReadPropertyInteger('InputTriggerID');
         if (($SenderID == $triggerID) && ($Message == VM_UPDATE) && (boolval($Data[0]))) {
             $this->Start();
         }
@@ -58,24 +59,23 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function RequestAction($Ident, $Value)
     {
-
         switch ($Ident) {
-            case "Active":
+            case 'Active':
                 $this->SetActive($Value);
                 break;
             default:
-                throw new Exception("Invalid ident");
+                throw new Exception('Invalid ident');
         }
     }
 
     public function SetActive(bool $Value)
     {
-        SetValue($this->GetIDForIdent("Active"), $Value);
+        SetValue($this->GetIDForIdent('Active'), $Value);
     }
 
     public function Start()
     {
-        if (!GetValue($this->GetIDForIdent("Active"))) {
+        if (!GetValue($this->GetIDForIdent('Active'))) {
             return;
         }
 
@@ -83,8 +83,8 @@ class Treppenhauslichtsteuerung extends IPSModule
             return;
         }
 
-        $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-        $outputID = $this->ReadPropertyInteger("OutputID");
+        $triggerID = $this->ReadPropertyInteger('InputTriggerID');
+        $outputID = $this->ReadPropertyInteger('OutputID');
 
         //If InputTriggerID and TargetID are the same we need to check if switching is required
         //Otherwise it will result in an endless loop
@@ -96,36 +96,35 @@ class Treppenhauslichtsteuerung extends IPSModule
             $this->SwitchVariable(true);
         }
 
-        $duration = $this->ReadPropertyInteger("Duration");
-        $this->SetTimerInterval("OffTimer", $duration * 60 * 1000);
+        $duration = $this->ReadPropertyInteger('Duration');
+        $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
     }
 
     public function Stop()
     {
         $this->SwitchVariable(false);
-        $this->SetTimerInterval("OffTimer", 0);
+        $this->SetTimerInterval('OffTimer', 0);
     }
 
     private function SwitchVariable(bool $Value)
     {
-
-        $outputID = $this->ReadPropertyInteger("OutputID");
+        $outputID = $this->ReadPropertyInteger('OutputID');
         $variable = IPS_GetVariable($outputID);
         $actionID = $this->GetProfileAction($variable);
 
         //Quit if actionID is not a valid target
         if ($actionID < 10000) {
-            echo $this->Translate("The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable.");
+            echo $this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable.');
             return;
         }
 
-        if (IPS_GetVariable($outputID)["VariableType"] == VARIABLETYPE_BOOLEAN) {
+        if (IPS_GetVariable($outputID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
             RequestAction($outputID, $Value);
         } else {
             $profileName = $this->GetProfileName($variable);
             //Quit if output variable has no profile
             if (!IPS_VariableProfileExists($profileName)) {
-                echo $this->Translate("The output variable of the Treppenhauslichtsteuerung has no variable profile. Please choose a variable with a variable profile or add a variable profile to the output variable.");
+                echo $this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable profile. Please choose a variable with a variable profile or add a variable profile to the output variable.');
                 return;
             }
             $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
@@ -133,7 +132,7 @@ class Treppenhauslichtsteuerung extends IPSModule
 
             //Quit if min is greater than max value
             if ($maxValue - $minValue <= 0) {
-                echo $this->Translate("The profile of the output variable has no defined max value. Please update the max value or choose another profile.");
+                echo $this->Translate('The profile of the output variable has no defined max value. Please update the max value or choose another profile.');
                 return;
             }
 
@@ -151,7 +150,7 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     private function GetProfileName($variable)
     {
-        if ($variable['VariableCustomProfile'] != "") {
+        if ($variable['VariableCustomProfile'] != '') {
             return $variable['VariableCustomProfile'];
         } else {
             return $variable['VariableProfile'];
