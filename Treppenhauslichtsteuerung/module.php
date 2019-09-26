@@ -21,33 +21,29 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
         if(IPS_VariableExists($triggerID)) {
-            //Deactivate instance if output variable is not from type boolean 
-            if (IPS_GetVariable($triggerID)["VariableType"] != 0) {
-                //Setting the instance in error condition
-                $this->SetStatus(202);
-            } else {
-                //Setting the instance in active condition
-                $this->SetStatus(102);
-                $this->RegisterMessage($triggerID, VM_UPDATE);
-            }  
+            $this->RegisterMessage($triggerID, VM_UPDATE);
+            $this->SetStatus(IS_ACTIVE);
         } else {
-            //Setting the instance in error condition
-            $this->SetStatus(203);
+            if($triggerID == 0) {
+                $this->SetStatus(IS_INACTIVE);
+            } else {
+                $this->SetStatus(IS_EBASE + 2);
+            }
         }
     
         $outputID = $this->ReadPropertyInteger("OutputID");
-        if(IPS_VariableExists($outputID) && $this->GetStatus() == 102) {
-            //Deactivate instance if output variable is from type string 
-            if (IPS_GetVariable($outputID)["VariableType"] == 3) {
-                //Setting the instance in error condition
-                $this->SetStatus(200);
+        if(IPS_VariableExists($outputID) && $this->GetStatus() == IS_ACTIVE) {
+            if (IPS_GetVariable($outputID)["VariableType"] == VARIABLETYPE_STRING) {
+                $this->SetStatus(IS_EBASE);
             } else {
-                //Setting the instance in active condition
-                $this->SetStatus(102);
+                $this->SetStatus(IS_ACTIVE);
             }  
-        } elseif ($this->GetStatus() == 102) {
-            //Setting the instance in error condition
-            $this->SetStatus(201);
+        } elseif ($this->GetStatus() == IS_ACTIVE) {
+            if($outputID == 0) {
+                $this->SetStatus(IS_INACTIVE);
+            } else {
+                $this->SetStatus(IS_EBASE + 1);
+            }
         }
           
     }
@@ -55,7 +51,7 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $triggerID = $this->ReadPropertyInteger("InputTriggerID");
-        if (($SenderID == $triggerID) && ($Message == VM_UPDATE)) {
+        if (($SenderID == $triggerID) && ($Message == VM_UPDATE) && (boolval($Data[0]))) {
             $this->Start();
         }
     }
@@ -123,7 +119,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             return;
         }
 
-        if (IPS_GetVariable($outputID)["VariableType"] == 0) {
+        if (IPS_GetVariable($outputID)["VariableType"] == VARIABLETYPE_BOOLEAN) {
             RequestAction($outputID, $Value);
         } else {
             $profileName = $this->GetProfileName($variable);
