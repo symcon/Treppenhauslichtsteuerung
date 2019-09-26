@@ -10,5 +10,6 @@
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
-    "prefix": "THL"
+    "prefix": "THL",
+    "url": "https://github.com/symcon/Treppenhauslichtsteuerung/tree/master/Treppenhauslichtsteuerung"
 }
