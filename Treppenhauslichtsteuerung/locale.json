@@ -5,7 +5,14 @@
             "Duration": "Dauer",
             "minutes": "Minuten",
             "Output Variable" : "Ausgabevariable",
-            "The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable." : "Die Ausgabevariable der Treppenhauslichtsteuerung hat keine Variablenaktion. Bitte wählen Sie eine Variable mit Variablenaktion oder fügen Sie der Ausgabevariablen eine Variablenaktion hinzu."
+            "The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable." : "Die Ausgabevariable der Treppenhauslichtsteuerung hat keine Variablenaktion. Bitte wählen Sie eine Variable mit Variablenaktion oder fügen Sie der Ausgabevariablen eine Variablenaktion hinzu.",
+            "The output variable of the Treppenhauslichtsteuerung has no variable profile. Please choose a variable with a variable profile or add a variable profile to the output variable." : "Die Ausgabevariable der Treppenhauslichtsteuerung hat kein Variablenprofil. Bitte wählen Sie eine Variable mit Variablenprofil oder fügen Sie der Ausgabevariablen ein Variablenprofil hinzu.",
+            "The profile of the output variable has no defined max value. Please update the max value or choose another profile." : "Die Ausgabevariable hat keinen definierten Maximalwert. Bitte aktualisieren Sie den Maximalwert oder wählen ein anderes Profil.",
+            "The selected output-variable must not be a string variable. Please select a non-string variable." : "Die Ausgabevariable darf keine String-Variable sein. Bitte wählen Sie eine Nicht-String-Variable.",
+            "The selected output-variable does not exist.": "Die ausgewählte Ausgabevariable existiert nicht.",
+            "The selected input sensor is not from type boolean. Please select a boolean variable.": "Der ausgewählte Eingabesensor ist nicht vom Typ boolean. Bitte wählen Sie eine boolesche Variable aus.",
+            "The selected input sensor does not exist." : "Der ausgewählte Eingabesensor existiert nicht.",
+            "There are not all variables set.": "Es sind nicht alle Variablen gesetzt."
         }
     }
 }
