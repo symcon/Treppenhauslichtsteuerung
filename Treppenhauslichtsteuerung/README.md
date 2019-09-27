@@ -2,7 +2,7 @@
 Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der Auslöser wiederholt aktiviert bleibt das Licht an und der Timer wird zurückgesetzt. Erst wenn für eine vorgegebene Zeit keine weitere Auslösung stattfindet wird das Licht ausgeschaltet.
 
 
-### Inhaltverzeichnis
+### Inhaltsverzeichnis
 
 1. [Funktionsumfang](#1-funktionsumfang)
 2. [Voraussetzungen](#2-voraussetzungen)
@@ -23,13 +23,13 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 ### 3. Software-Installation
 
-* Über den Modul Store das Modul Treppenhauslichtsteuerung installieren.
-* Alternativ über das Modul Control folgende URL hinzufügen:
-´https://github.com/symcon/Treppenhauslichtsteuerung`
+* Über den Module Store das Modul Treppenhauslichtsteuerung installieren.
+* Alternativ über das Module Control folgende URL hinzufügen:
+`https://github.com/symcon/Treppenhauslichtsteuerung`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-- Unter "Instanz hinzufügen" ist das 'Treppenhauslicht'-Modul unter dem Hersteller '(Sonstige)' aufgeführt.  
+- Unter "Instanz hinzufügen" ist das 'Treppenhauslicht'-Modul unter dem Hersteller '(Gerät)' aufgeführt.  
 
 __Konfigurationsseite__:
 
