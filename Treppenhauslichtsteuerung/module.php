@@ -47,6 +47,17 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $this->SetStatus(IS_EBASE + 1);
             }
         }
+
+        //Add references
+        foreach ($this->GetReferenceList() as $referenceID) {
+            $this->UnregisterReference($referenceID);
+        }
+        if (IPS_VariableExists($triggerID)) {
+            $this->RegisterReference($triggerID);
+        }
+        if (IPS_VariableExists($outputID)) {
+            $this->RegisterReference($outputID);
+        }
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
