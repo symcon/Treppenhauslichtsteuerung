@@ -29,7 +29,7 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-- Unter "Instanz hinzufügen" ist das 'Treppenhauslicht'-Modul unter dem Hersteller '(Gerät)' aufgeführt.  
+- Unter "Instanz hinzufügen" kann das 'Treppenhauslicht'-Modul mithilfe der Schnellsuche gefunden werden.  
 
 __Konfigurationsseite__:
 
