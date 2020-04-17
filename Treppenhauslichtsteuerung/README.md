@@ -29,7 +29,8 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-- Unter "Instanz hinzufügen" kann das 'Treppenhauslicht'-Modul mithilfe der Schnellsuche gefunden werden.  
+- Unter "Instanz hinzufügen" kann das 'Treppenhauslicht'-Modul mithilfe des Schnellfilters gefunden werden.
+    - Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
 
