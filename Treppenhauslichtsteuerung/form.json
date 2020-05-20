@@ -3,7 +3,9 @@
     [
         { "type": "SelectVariable", "name": "InputTriggerID", "caption": "Input Sensor" },
         { "type": "NumberSpinner", "name": "Duration", "caption": "Duration", "suffix": "minutes"},
-        { "type": "SelectVariable", "name": "OutputID", "caption": "Output Variable" }
+        { "type": "SelectVariable", "name": "OutputID", "caption": "Output Variable" },
+        { "type": "CheckBox", "name": "DisplayRemaining", "caption": "Display remaing time", "onChange": "THL_ToggleDisplayInterval($id, $DisplayRemaining);" },
+        { "type": "NumberSpinner", "name": "UpdateInterval", "caption": "Update Interval", "suffix": "Seconds" }
     ],
     "status":
     [
