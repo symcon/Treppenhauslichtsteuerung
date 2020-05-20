@@ -16,6 +16,7 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 * Auswahl von Ein- und Ausgabevariable.
 * Auswahl der Dauer bevor das Licht ausgeschaltet wird.
+* Möglichkeit die verbleibende Zeit bis zum Auschalten anzuzeigen
 
 ### 2. Voraussetzungen
 
@@ -38,6 +39,8 @@ Name                      | Beschreibung
 Auswahl "Eingabesensor"   | Auswahl des Eingabesensors, bei dessen Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensor oder Taster - Das Licht wird aktiviert sobald die Variable auf einen Wert gesetzt wird, der nicht false, 0, oder "" ist.
 Dropdown "Dauer"          | Nachdem die ausgewählte Dauer ohne weitere Auslösung des Eingabesensors vergeht, wird das Licht deaktiviert
 Auswahl "Ausgabevariable" | Auswahl der Variablen, welche das Licht darstellt
+Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt
+Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird
 
 ### 5. Statusvariablen und Profile
 
@@ -46,6 +49,7 @@ Auswahl "Ausgabevariable" | Auswahl der Variablen, welche das Licht darstellt
 Name                       | Typ     | Beschreibung
 -------------------------- | ------- | ---------------------------
 Treppenhaussteuerung aktiv | Boolean | Die Variable gibt an, ob die Treppenhaussteuerung aktiviert ist
+Restzeit                   | String  | Wenn "Restlaufzeit anzeigen" aktiv ist wird hier die verbleibende Zeit bis zum Auschalten angezeigt
 
 ##### Profile:
 

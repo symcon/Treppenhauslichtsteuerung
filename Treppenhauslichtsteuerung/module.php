@@ -8,10 +8,18 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Never delete this line!
         parent::Create();
 
+        //Properties
         $this->RegisterPropertyInteger('InputTriggerID', 0);
         $this->RegisterPropertyInteger('Duration', 1);
         $this->RegisterPropertyInteger('OutputID', 0);
+        $this->RegisterPropertyBoolean('DisplayRemaining', false);
+        $this->RegisterPropertyInteger('UpdateInterval', 10);
+
+        //Timers
         $this->RegisterTimer('OffTimer', 0, "THL_Stop(\$_IPS['TARGET']);");
+        $this->RegisterTimer('UpdateRemainingTimer', 0, "THL_UpdateRemaining(\$_IPS['TARGET']);");
+
+        //Variables
         $this->RegisterVariableBoolean('Active', 'Treppenhauslichtsteuerung aktiv', '~Switch');
         $this->EnableAction('Active');
     }
@@ -58,6 +66,8 @@ class Treppenhauslichtsteuerung extends IPSModule
         if (IPS_VariableExists($outputID)) {
             $this->RegisterReference($outputID);
         }
+
+        $this->MaintainVariable('Remaining', $this->Translate('Remaining time'), VARIABLETYPE_STRING, '', 10, $this->ReadPropertyBoolean('DisplayRemaining'));
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -77,6 +87,18 @@ class Treppenhauslichtsteuerung extends IPSModule
             default:
                 throw new Exception('Invalid ident');
         }
+    }
+
+    public function GetConfigurationForm()
+    {
+        $jsonForm = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $jsonForm['elements'][4]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        return json_encode($jsonForm);
+    }
+
+    public function ToggleDisplayInterval($visible)
+    {
+        $this->UpdateFormField('UpdateInterval', 'visible', $visible);
     }
 
     public function SetActive(bool $Value)
@@ -109,12 +131,38 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         $duration = $this->ReadPropertyInteger('Duration');
         $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
+        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
+            $this->SetTimerInterval('UpdateRemainingTimer', 1000 * $this->ReadPropertyInteger('UpdateInterval'));
+            $this->UpdateRemaining();
+        }
     }
 
     public function Stop()
     {
         $this->SwitchVariable(false);
         $this->SetTimerInterval('OffTimer', 0);
+        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
+            $this->SetTimerInterval('UpdateRemainingTimer', 0);
+            $this->SetValue('Remaining', '00:00:00');
+        }
+    }
+
+    public function UpdateRemaining()
+    {
+        $remainingID = $this->GetIDForIdent('Remaining');
+        $nexRun = 0;
+        $timers = IPS_GetTimerList();
+        //Get NextRun of "OffTimer"
+        foreach ($timers as $timerID) {
+            $timer = IPS_GetTimer($timerID);
+            if (($timer['InstanceID'] == $this->InstanceID) && ($timer['Name'] == 'OffTimer')) {
+                $nextRun = $timer['NextRun'];
+                break;
+            }
+        }
+        $secondsRemaining = $nextRun - time();
+        //Dispaly remaining time as string
+        $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
 
     private function SwitchVariable(bool $Value)
