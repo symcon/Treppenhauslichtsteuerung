@@ -40,30 +40,30 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         //Checking input sensors and register update messages
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-        
+
         //Inactive if no sensors
-        if (sizeof($inputTriggers) > 0) {
+        if (count($inputTriggers) > 0) {
             $inputError = true;
             $InputErrorCode = IS_ACTIVE;
             foreach ($inputTriggers as $inputTrigger) {
                 $triggerID = $inputTrigger['VariableID'];
                 $InputErrorCode = $this->checkVariable($triggerID, THL_INPUT);
-                if ( $InputErrorCode == 0) {
+                if ($InputErrorCode == 0) {
                     $this->RegisterMessage($triggerID, VM_UPDATE);
                     $this->RegisterReference($triggerID);
                     $inputError = false;
                 }
             }
-            if($inputError) {
+            if ($inputError) {
                 $this->SetStatus(IS_EBASE);
-            }   
+            }
         } else {
             $this->SetStatus(IS_INACTIVE);
         }
 
-        //Checking output variables 
+        //Checking output variables
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
-        
+
         //Inactive if no output
         if (count($outputVariables) > 0) {
             $outputError = true;
@@ -89,14 +89,14 @@ class Treppenhauslichtsteuerung extends IPSModule
     {
         //Add options to form
         $jsonForm = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        
+
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
         $errorsInput = $this->errorsToString($inputTriggers, THL_INPUT);
-        
+
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
         $errorsOutput = $this->errorsToString($outputVariables, THL_OUTPUT);
         if (($errorsInput != '') || ($errorsOutput != '')) {
-            $jsonForm['elements'][0]['caption'] = $errorsInput .$errorsOutput;
+            $jsonForm['elements'][0]['caption'] = $errorsInput . $errorsOutput;
             $jsonForm['elements'][0]['visible'] = true;
         }
         //Set visibility of remaining time options
@@ -144,7 +144,6 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
 
         $this->SwitchVariable(true);
-
 
         $duration = $this->ReadPropertyInteger('Duration');
         $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
@@ -198,7 +197,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             if (IPS_GetVariable($outputID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 RequestAction($outputID, $Value);
                 continue;
-            } else {    
+            } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
                 $actionValue = 0;
                 if ($Value) {
@@ -223,7 +222,6 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     private function checkVariable($variableID, $type)
     {
-
         if (!IPS_VariableExists($variableID)) {
             switch ($type) {
                 case THL_INPUT:
@@ -241,7 +239,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $this->LogMessage($this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable.'), KL_WARNING);
                 return IS_EBASE + 3;
             }
-            
+
             if (IPS_GetVariable($variableID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 return 0;
             } else {
@@ -253,27 +251,26 @@ class Treppenhauslichtsteuerung extends IPSModule
                 }
                 $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
                 $minValue = IPS_GetVariableProfile($profileName)['MinValue'];
-    
+
                 //Quit if min is greater than max value
                 if ($maxValue - $minValue <= 0) {
-                $this->LogMessage($this->Translate('The profile of the output variable has no defined max value. Please update the max value or choose another profile.'), KL_WARNING);
+                    $this->LogMessage($this->Translate('The profile of the output variable has no defined max value. Please update the max value or choose another profile.'), KL_WARNING);
                     return IS_EBASE + 5;
                 }
-    
             }
         }
 
         return 0;
-        
     }
 
-    private function errorsToString(array $list, int $type) {
+    private function errorsToString(array $list, int $type)
+    {
         $errors = [];
         foreach ($list as $variable) {
             $variableID = $variable['VariableID'];
             $errorCode = $this->checkVariable($variableID, $type);
-            if ( $errorCode != 0) {
-                if(!in_array($errorCode, $errors)) {
+            if ($errorCode != 0) {
+                if (!in_array($errorCode, $errors)) {
                     $errors[$errorCode] = [];
                 }
                 $errors[$errorCode][] = $variableID;
@@ -281,21 +278,21 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
         $labelCaption = '';
         foreach ($errors as $error => $variables) {
-            switch($error) {
+            switch ($error) {
                 case 200:
-                    $labelCaption .= $this->Translate("The following output-variables must not be a string variable. Please select a non-string variable.") . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output-variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
                     break;
                 case 201:
-                    $labelCaption .= $this->Translate("The following output-variables do not exist.") . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output-variables do not exist.') . PHP_EOL;
                     break;
                 case 202:
-                    $labelCaption .= $this->Translate("The following input sensors do not exist.") . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following input sensors do not exist.') . PHP_EOL;
                     break;
                 case 203:
-                    $labelCaption .= $this->Translate("The following output-variables have no action.") . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output-variables have no action.') . PHP_EOL;
                     break;
                 default:
-                $labelCaption .= $this->Translate("The following variables have unknown errors.") . PHP_EOL;
+                $labelCaption .= $this->Translate('The following variables have unknown errors.') . PHP_EOL;
                 break;
             }
             foreach ($variables as $variable) {
@@ -309,9 +306,10 @@ class Treppenhauslichtsteuerung extends IPSModule
         return $labelCaption;
     }
 
-    private function isTrigger(int $outputID) {
+    private function isTrigger(int $outputID)
+    {
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-        foreach($inputTriggers as $variable){
+        foreach ($inputTriggers as $variable) {
             if ($variable['VariableID'] == $outputID) {
                 return true;
             }
