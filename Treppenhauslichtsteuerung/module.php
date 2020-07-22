@@ -50,14 +50,17 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $newProperty[] = ['VariableID' => $this->ReadPropertyInteger($legacy)];
                 IPS_SetProperty($this->InstanceID, $legacy, 0);
                 IPS_SetProperty($this->InstanceID, $new, json_encode($newProperty));
-                IPS_ApplyChanges($this->InstanceID);
                 return true;
+            } else {
+                return false;
             }
         };
-        if ($transferProperty('InputTriggerID', 'InputTriggers')) {
-            return;
-        }
-        if ($transferProperty('OutputID', 'OutputVariables')) {
+        
+        $legacyUpdateInput = $transferProperty('InputTriggerID', 'InputTriggers');
+        $legacyUpdateOutput = $transferProperty('OutputID', 'OutputVariables');
+
+        if ($legacyUpdateInput || $legacyUpdateOutput) {
+            IPS_ApplyChanges($this->InstanceID);
             return;
         }
 
