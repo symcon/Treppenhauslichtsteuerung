@@ -69,12 +69,12 @@
         {
             "code": 104,
             "icon": "inactive",
-            "caption": "There are not all variables set."
+            "caption": "Both lists need to be populated."
         },
         {
             "code": 200,
             "icon": "error",
-            "caption": "The instance is faulty"
+            "caption": "The instance is erroneous."
         }
     ],
     "actions": [
