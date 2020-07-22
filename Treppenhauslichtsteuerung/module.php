@@ -55,7 +55,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 return false;
             }
         };
-        
+
         $legacyUpdateInput = $transferProperty('InputTriggerID', 'InputTriggers');
         $legacyUpdateOutput = $transferProperty('OutputID', 'OutputVariables');
 
