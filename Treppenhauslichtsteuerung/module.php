@@ -17,6 +17,10 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyBoolean('DisplayRemaining', false);
         $this->RegisterPropertyInteger('UpdateInterval', 10);
 
+        //Registering legacy properties to transfer the data
+        $this->RegisterPropertyInteger('InputTriggerID', 0);
+        $this->RegisterPropertyInteger('OutputID', 0);
+
         //Timers
         $this->RegisterTimer('OffTimer', 0, "THL_Stop(\$_IPS['TARGET']);");
         $this->RegisterTimer('UpdateRemainingTimer', 0, "THL_UpdateRemaining(\$_IPS['TARGET']);");
@@ -36,6 +40,25 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Delete all references in order to readd them
         foreach ($this->GetReferenceList() as $referenceID) {
             $this->UnregisterReference($referenceID);
+        }
+
+        //Transfer legacy data
+        $transferProperty = function ($legacy, $new)
+        {
+            $newProperty = json_decode($this->ReadPropertyString($new), true);
+            if ($this->ReadPropertyInteger($legacy) != 0) {
+                $newProperty[] = ['VariableID' => $this->ReadPropertyInteger($legacy)];
+                IPS_SetProperty($this->InstanceID, $legacy, 0);
+                IPS_SetProperty($this->InstanceID, $new, json_encode($newProperty));
+                IPS_ApplyChanges($this->InstanceID);
+                return true;
+            }
+        };
+        if ($transferProperty('InputTriggerID', 'InputTriggers')) {
+            return;
+        }
+        if ($transferProperty('OutputID', 'OutputVariables')) {
+            return;
         }
 
         //Checking input sensors and register update messages
@@ -106,7 +129,6 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        //TODO: Check if sender is trigger
         if (($Message == VM_UPDATE) && (boolval($Data[0]))) {
             $this->Start($SenderID);
         }
@@ -235,6 +257,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             if (IPS_GetVariable($variableID)['VariableType'] == VARIABLETYPE_STRING) {
                 return IS_EBASE;
             }
+
             if (!HasAction($variableID)) {
                 $this->LogMessage($this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable.'), KL_WARNING);
                 return IS_EBASE + 3;
@@ -280,16 +303,16 @@ class Treppenhauslichtsteuerung extends IPSModule
         foreach ($errors as $error => $variables) {
             switch ($error) {
                 case 200:
-                    $labelCaption .= $this->Translate('The following output-variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
                     break;
                 case 201:
-                    $labelCaption .= $this->Translate('The following output-variables do not exist.') . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output variables do not exist.') . PHP_EOL;
                     break;
                 case 202:
                     $labelCaption .= $this->Translate('The following input sensors do not exist.') . PHP_EOL;
                     break;
                 case 203:
-                    $labelCaption .= $this->Translate('The following output-variables have no action.') . PHP_EOL;
+                    $labelCaption .= $this->Translate('The following output variables have no action.') . PHP_EOL;
                     break;
                 default:
                 $labelCaption .= $this->Translate('The following variables have unknown errors.') . PHP_EOL;
