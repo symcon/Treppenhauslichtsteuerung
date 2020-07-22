@@ -113,14 +113,56 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function GetConfigurationForm()
     {
+        $errorsToString = function (array $list, int $type)
+        {
+            $errors = [];
+            foreach ($list as $variable) {
+                $variableID = $variable['VariableID'];
+                $errorCode = $this->checkVariable($variableID, $type);
+                if ($errorCode != 0) {
+                    if (!in_array($errorCode, $errors)) {
+                        $errors[$errorCode] = [];
+                    }
+                    $errors[$errorCode][] = $variableID;
+                }
+            }
+            $labelCaption = '';
+            foreach ($errors as $error => $variables) {
+                switch ($error) {
+                    case 200:
+                        $labelCaption .= $this->Translate('The following output variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
+                        break;
+                    case 201:
+                        $labelCaption .= $this->Translate('The following output variables do not exist.') . PHP_EOL;
+                        break;
+                    case 202:
+                        $labelCaption .= $this->Translate('The following input sensors do not exist.') . PHP_EOL;
+                        break;
+                    case 203:
+                        $labelCaption .= $this->Translate('The following output variables have no action.') . PHP_EOL;
+                        break;
+                    default:
+                    $labelCaption .= $this->Translate('The following variables have unknown errors.') . PHP_EOL;
+                    break;
+                }
+                foreach ($variables as $variable) {
+                    if (!IPS_VariableExists($variable)) {
+                        $labelCaption .= '  - ' . sprintf($this->Translate("The object #%s doesn't exist."), $variable) . PHP_EOL;
+                    } else {
+                        $labelCaption .= '  - ' . IPS_GetLocation($variable) . PHP_EOL;
+                    }
+                }
+            }
+            return $labelCaption;
+        };
         //Add options to form
         $jsonForm = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-        $errorsInput = $this->errorsToString($inputTriggers, THL_INPUT);
+        $errorsInput = $errorsToString($inputTriggers, THL_INPUT);
 
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
-        $errorsOutput = $this->errorsToString($outputVariables, THL_OUTPUT);
+        $errorsOutput = $errorsToString($outputVariables, THL_OUTPUT);
         if (($errorsInput != '') || ($errorsOutput != '')) {
             $jsonForm['elements'][0]['caption'] = $errorsInput . $errorsOutput;
             $jsonForm['elements'][0]['visible'] = true;
@@ -215,15 +257,29 @@ class Treppenhauslichtsteuerung extends IPSModule
                 continue;
             }
 
-            if ($Value && $this->isTrigger($outputID) && GetValue($outputID)) {
+            //If target and trigger are equal we need to check if switching is required to prevent an endless loop
+            $isTrigger = function (int $outputID)
+            {
+                $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
+                foreach ($inputTriggers as $variable) {
+                    if ($variable['VariableID'] == $outputID) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            if ($Value && $isTrigger($outputID) && GetValue($outputID)) {
                 continue;
             }
 
             if (IPS_GetVariable($outputID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 RequestAction($outputID, $Value);
-                continue;
             } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
+                $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
+                $minValue = IPS_GetVariableProfile($profileName)['MinValue'];
+
                 $actionValue = 0;
                 if ($Value) {
                     $actionValue = $maxValue;
@@ -287,59 +343,5 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
 
         return 0;
-    }
-
-    private function errorsToString(array $list, int $type)
-    {
-        $errors = [];
-        foreach ($list as $variable) {
-            $variableID = $variable['VariableID'];
-            $errorCode = $this->checkVariable($variableID, $type);
-            if ($errorCode != 0) {
-                if (!in_array($errorCode, $errors)) {
-                    $errors[$errorCode] = [];
-                }
-                $errors[$errorCode][] = $variableID;
-            }
-        }
-        $labelCaption = '';
-        foreach ($errors as $error => $variables) {
-            switch ($error) {
-                case 200:
-                    $labelCaption .= $this->Translate('The following output variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
-                    break;
-                case 201:
-                    $labelCaption .= $this->Translate('The following output variables do not exist.') . PHP_EOL;
-                    break;
-                case 202:
-                    $labelCaption .= $this->Translate('The following input sensors do not exist.') . PHP_EOL;
-                    break;
-                case 203:
-                    $labelCaption .= $this->Translate('The following output variables have no action.') . PHP_EOL;
-                    break;
-                default:
-                $labelCaption .= $this->Translate('The following variables have unknown errors.') . PHP_EOL;
-                break;
-            }
-            foreach ($variables as $variable) {
-                if (!IPS_VariableExists($variable)) {
-                    $labelCaption .= '  - ' . sprintf($this->Translate("The object #%s doesn't exist."), $variable) . PHP_EOL;
-                } else {
-                    $labelCaption .= '  - ' . IPS_GetLocation($variable) . PHP_EOL;
-                }
-            }
-        }
-        return $labelCaption;
-    }
-
-    private function isTrigger(int $outputID)
-    {
-        $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-        foreach ($inputTriggers as $variable) {
-            if ($variable['VariableID'] == $outputID) {
-                return true;
-            }
-        }
-        return false;
     }
 }
