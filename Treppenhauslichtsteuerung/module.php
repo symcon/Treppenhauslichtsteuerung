@@ -272,13 +272,15 @@ class Treppenhauslichtsteuerung extends IPSModule
             if ($Value && $isTrigger($outputID) && GetValue($outputID)) {
                 continue;
             }
-
-            if (IPS_GetVariable($outputID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
+            $outputVariable = IPS_GetVariable($outputID);
+            if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 RequestAction($outputID, $Value);
             } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
-                $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
-                $minValue = IPS_GetVariableProfile($profileName)['MinValue'];
+                $profile = IPS_GetVariableProfile($this->GetProfileName($outputVariable));
+
+                $maxValue = $profile['MaxValue'];
+                $minValue = $profile['MinValue'];
 
                 $actionValue = 0;
                 if ($Value) {
@@ -313,7 +315,8 @@ class Treppenhauslichtsteuerung extends IPSModule
             }
         }
         if ($type == THL_OUTPUT) {
-            if (IPS_GetVariable($variableID)['VariableType'] == VARIABLETYPE_STRING) {
+            $variable = IPS_GetVariable($variableID);
+            if ($variable['VariableType'] == VARIABLETYPE_STRING) {
                 return IS_EBASE;
             }
 
@@ -322,7 +325,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 return IS_EBASE + 3;
             }
 
-            if (IPS_GetVariable($variableID)['VariableType'] == VARIABLETYPE_BOOLEAN) {
+            if ($variable['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 return 0;
             } else {
                 $profileName = $this->GetProfileName($variable);
