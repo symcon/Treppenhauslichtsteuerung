@@ -274,7 +274,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             }
             $outputVariable = IPS_GetVariable($outputID);
             if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                $actionValue =  $Value;
+                $actionValue = $Value;
                 if ($this->profileReversed($outputID)) {
                     $actionValue = !$Value;
                 }
@@ -364,5 +364,4 @@ class Treppenhauslichtsteuerung extends IPSModule
     {
         return substr($this->GetProfileName(IPS_GetVariable($VariableID)), -strlen('.Reversed')) === '.Reversed';
     }
-
 }
