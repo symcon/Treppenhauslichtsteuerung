@@ -147,7 +147,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 }
                 foreach ($variables as $variable) {
                     if (!IPS_VariableExists($variable)) {
-                        $labelCaption .= '  - ' . sprintf($this->Translate("The object #%s doesn't exist."), $variable) . PHP_EOL;
+                        $labelCaption .= '  - ' . sprintf($this->Translate("The object #%d doesn't exist."), $variable) . PHP_EOL;
                     } else {
                         $labelCaption .= '  - ' . IPS_GetLocation($variable) . PHP_EOL;
                     }
@@ -175,7 +175,7 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         if (($Message == VM_UPDATE) && (boolval($Data[0]))) {
-            $this->Start($SenderID);
+            $this->Start();
         }
     }
 
@@ -200,7 +200,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         SetValue($this->GetIDForIdent('Active'), $Value);
     }
 
-    public function Start(int $triggerID)
+    public function Start()
     {
         if (!GetValue($this->GetIDForIdent('Active'))) {
             return;
@@ -274,7 +274,11 @@ class Treppenhauslichtsteuerung extends IPSModule
             }
             $outputVariable = IPS_GetVariable($outputID);
             if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                RequestAction($outputID, $Value);
+                $actionValue =  $Value;
+                if ($this->profileReversed($outputID)) {
+                    $actionValue = !$Value;
+                }
+                RequestAction($outputID, $actionValue);
             } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
                 $profile = IPS_GetVariableProfile($this->GetProfileName($outputVariable));
@@ -283,10 +287,18 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $minValue = $profile['MinValue'];
 
                 $actionValue = 0;
-                if ($Value) {
-                    $actionValue = $maxValue;
+                if ($this->profileReversed($outputID)) {
+                    if ($Value) {
+                        $actionValue = $minValue;
+                    } else {
+                        $actionValue = $maxValue;
+                    }
                 } else {
-                    $actionValue = $minValue;
+                    if ($Value) {
+                        $actionValue = $maxValue;
+                    } else {
+                        $actionValue = $minValue;
+                    }
                 }
 
                 RequestAction($outputID, $actionValue);
@@ -347,4 +359,10 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         return 0;
     }
+
+    private function profileReversed($VariableID)
+    {
+        return substr($this->GetProfileName(IPS_GetVariable($VariableID)), -strlen('.Reversed')) === '.Reversed';
+    }
+
 }
