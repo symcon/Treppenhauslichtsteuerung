@@ -174,7 +174,8 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        if (($Message == VM_UPDATE) && (boolval($Data[0]))) {
+        $start = $this->profileReversed($SenderID) ? !boolval($Data[0]) : boolval($Data[0]);
+        if (($Message == VM_UPDATE) && $start) {
             $this->Start();
         }
     }
@@ -235,6 +236,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         $remainingID = $this->GetIDForIdent('Remaining');
         $nexRun = 0;
         $timers = IPS_GetTimerList();
+
         //Get NextRun of "OffTimer"
         foreach ($timers as $timerID) {
             $timer = IPS_GetTimer($timerID);
@@ -244,6 +246,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             }
         }
         $secondsRemaining = $nextRun - time();
+        
         //Dispaly remaining time as string
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
@@ -268,17 +271,14 @@ class Treppenhauslichtsteuerung extends IPSModule
                 }
                 return false;
             };
-
-            if ($Value && $isTrigger($outputID) && GetValue($outputID)) {
+            $isReversed = $this->profileReversed($outputID);
+            $tartgetValue = $isReversed ? !boolval($Value) : boolval($Value);
+            if ($variableValue && $isTrigger($outputID) && GetValue($outputID)) {
                 continue;
             }
             $outputVariable = IPS_GetVariable($outputID);
             if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                $actionValue = $Value;
-                if ($this->profileReversed($outputID)) {
-                    $actionValue = !$Value;
-                }
-                RequestAction($outputID, $actionValue);
+                RequestAction($outputID, $variableValue);
             } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
                 $profile = IPS_GetVariableProfile($this->GetProfileName($outputVariable));
@@ -286,21 +286,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $maxValue = $profile['MaxValue'];
                 $minValue = $profile['MinValue'];
 
-                $actionValue = 0;
-                if ($this->profileReversed($outputID)) {
-                    if ($Value) {
-                        $actionValue = $minValue;
-                    } else {
-                        $actionValue = $maxValue;
-                    }
-                } else {
-                    if ($Value) {
-                        $actionValue = $maxValue;
-                    } else {
-                        $actionValue = $minValue;
-                    }
-                }
-
+                $actionValue = $variableValue ? $maxValue : $minValue;
                 RequestAction($outputID, $actionValue);
             }
         }
