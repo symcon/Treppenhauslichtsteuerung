@@ -246,7 +246,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             }
         }
         $secondsRemaining = $nextRun - time();
-        
+
         //Dispaly remaining time as string
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
