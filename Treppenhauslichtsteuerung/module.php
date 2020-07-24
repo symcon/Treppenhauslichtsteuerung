@@ -272,13 +272,13 @@ class Treppenhauslichtsteuerung extends IPSModule
                 return false;
             };
             $isReversed = $this->profileReversed($outputID);
-            $tartgetValue = $isReversed ? !boolval($Value) : boolval($Value);
-            if ($variableValue && $isTrigger($outputID) && GetValue($outputID)) {
+            $targetValue = $isReversed ? !boolval($Value) : boolval($Value);
+            if ($isTrigger($outputID) && ($targetValue == GetValue($outputID))) {
                 continue;
             }
             $outputVariable = IPS_GetVariable($outputID);
             if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                RequestAction($outputID, $variableValue);
+                RequestAction($outputID, $targetValue);
             } else {
                 //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
                 $profile = IPS_GetVariableProfile($this->GetProfileName($outputVariable));
@@ -286,7 +286,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                 $maxValue = $profile['MaxValue'];
                 $minValue = $profile['MinValue'];
 
-                $actionValue = $variableValue ? $maxValue : $minValue;
+                $actionValue = $targetValue ? $maxValue : $minValue;
                 RequestAction($outputID, $actionValue);
             }
         }
