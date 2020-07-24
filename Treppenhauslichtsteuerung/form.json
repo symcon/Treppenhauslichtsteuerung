@@ -1,17 +1,86 @@
 {
     "elements":
     [
-        { "type": "SelectVariable", "name": "InputTriggerID", "caption": "Input Sensor" },
-        { "type": "NumberSpinner", "name": "Duration", "caption": "Duration", "suffix": "minutes"},
-        { "type": "SelectVariable", "name": "OutputID", "caption": "Output Variable" },
-        { "type": "CheckBox", "name": "DisplayRemaining", "caption": "Display remaing time", "onChange": "THL_ToggleDisplayInterval($id, $DisplayRemaining);" },
-        { "type": "NumberSpinner", "name": "UpdateInterval", "caption": "Update Interval", "suffix": "Seconds" }
+    {
+        "type": "Label",
+        "name": "ErrorLabel",
+        "caption": "",
+        "visible": false
+    },
+    {
+        "type": "List",
+        "name": "InputTriggers",
+        "caption": "Input Sensors",
+        "add": true, 
+        "delete": true,
+        "rowCount": 4,
+        "columns": [
+            {
+                "name": "VariableID",
+                "caption": "Variable",
+                "width": "auto",
+                "add": 0,
+                "edit": {
+                    "type": "SelectVariable"
+                }
+            }
+        ]
+        },
+        {
+            "type": "List",
+            "name": "OutputVariables",
+            "caption": "Output Variables",
+            "add": true, 
+            "delete": true,
+            "rowCount": 4,
+            "columns": [
+                {
+                    "name": "VariableID",
+                    "caption": "Variable",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "Duration",
+            "caption": "Duration",
+            "suffix": "minutes"
+        },
+        {
+            "type": "CheckBox",
+            "name": "DisplayRemaining",
+            "caption": "Display remaing time",
+            "onChange": "THL_ToggleDisplayInterval($id, $DisplayRemaining);"
+        },
+        {
+            "type": "NumberSpinner", 
+            "name": "UpdateInterval", 
+            "caption": "Update Interval",
+            "suffix": "Seconds"
+        }
     ],
     "status":
     [
-        { "code": 104, "icon": "inactive","caption": "There are not all variables set."},
-        { "code": 200, "icon": "error", "caption": "The selected output-variable must not be a string variable. Please select a non-string variable." },
-        { "code":201, "icon": "error", "caption": "The selected output-variable does not exist."},
-        { "code":202, "icon": "error", "caption": "The selected input sensor does not exist."}
+        {
+            "code": 104,
+            "icon": "inactive",
+            "caption": "Both lists need to be populated."
+        },
+        {
+            "code": 200,
+            "icon": "error",
+            "caption": "The instance is erroneous."
+        }
+    ],
+    "actions": [
+        {
+            "type":
+            "TestCenter"
+        }
     ]
 }
