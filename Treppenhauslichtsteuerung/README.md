@@ -37,11 +37,11 @@ __Konfigurationsseite__:
 
 Name                      | Beschreibung
 ------------------------- | ---------------------------------
-Eingabesensoren           | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald die Variable auf einen Wert gesetzt wird, der nicht false, 0, oder "" ist.
-Ausgabevariable           | Liste der Variablen, welche das Licht darstellen
-Dauer                     | Nachdem die ausgewählte Dauer ohne weitere Auslösung des Eingabesensors vergeht, wird das Licht deaktiviert
-Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt
-Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird
+Eingabesensoren           | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
+Ausgabevariablen          | Liste der Variablen, welche aktiv geschaltet werden und das Licht darstellen. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
+Dauer                     | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
+Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
+Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
 
 ### 5. Statusvariablen und Profile
 
