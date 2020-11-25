@@ -14,9 +14,9 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 ### 1. Funktionsumfang
 
-* Auswahl von Ein- und Ausgabevariable.
+* Auswahl von Ein- und Ausgabevariablen in einer Liste.
 * Auswahl der Dauer bevor das Licht ausgeschaltet wird.
-* Möglichkeit die verbleibende Zeit bis zum Auschalten anzuzeigen
+* Möglichkeit die verbleibende Zeit bis zum Auschalten anzuzeigen.
 
 ### 2. Voraussetzungen
 
@@ -37,11 +37,11 @@ __Konfigurationsseite__:
 
 Name                      | Beschreibung
 ------------------------- | ---------------------------------
-Auswahl "Eingabesensor"   | Auswahl des Eingabesensors, bei dessen Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensor oder Taster - Das Licht wird aktiviert sobald die Variable auf einen Wert gesetzt wird, der nicht false, 0, oder "" ist.
-Dropdown "Dauer"          | Nachdem die ausgewählte Dauer ohne weitere Auslösung des Eingabesensors vergeht, wird das Licht deaktiviert
-Auswahl "Ausgabevariable" | Auswahl der Variablen, welche das Licht darstellt
-Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt
-Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird
+Eingabesensoren           | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
+Ausgabevariablen          | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden akiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
+Dauer                     | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
+Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
+Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
 
 ### 5. Statusvariablen und Profile
 
