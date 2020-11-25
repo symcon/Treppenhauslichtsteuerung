@@ -16,6 +16,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyInteger('Duration', 1);
         $this->RegisterPropertyBoolean('DisplayRemaining', false);
         $this->RegisterPropertyInteger('UpdateInterval', 10);
+        $this->RegisterPropertyBoolean('ResentAction', false);
 
         //Registering legacy properties to transfer the data
         $this->RegisterPropertyInteger('InputTriggerID', 0);
@@ -168,7 +169,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             $jsonForm['elements'][0]['visible'] = true;
         }
         //Set visibility of remaining time options
-        $jsonForm['elements'][5]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
         return json_encode($jsonForm);
     }
 
@@ -260,6 +261,9 @@ class Treppenhauslichtsteuerung extends IPSModule
                 continue;
             }
 
+            $isReversed = $this->profileReversed($outputID);
+            $targetValue = $isReversed ? !boolval($Value) : boolval($Value);
+
             //If target and trigger are equal we need to check if switching is required to prevent an endless loop
             $isTrigger = function (int $outputID)
             {
@@ -271,11 +275,16 @@ class Treppenhauslichtsteuerung extends IPSModule
                 }
                 return false;
             };
-            $isReversed = $this->profileReversed($outputID);
-            $targetValue = $isReversed ? !boolval($Value) : boolval($Value);
             if ($isTrigger($outputID) && ($targetValue == GetValue($outputID))) {
                 continue;
             }
+
+            //Check if action should be resent
+            if (!$this->ReadPropertyBoolean('ResentAction') && ($targetValue == GetValue($outputID))) {
+                continue;
+            }
+
+            //Update the output
             $outputVariable = IPS_GetVariable($outputID);
             if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
                 RequestAction($outputID, $targetValue);

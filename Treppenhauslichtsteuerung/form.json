@@ -52,6 +52,15 @@
             "suffix": "minutes"
         },
         {
+            "type": "Label",
+            "caption": "For unreliable or timed devices it might be required to resent the action on each trigger"
+        },
+        {
+            "type": "CheckBox",
+            "name": "ResentAction",
+            "caption": "Resent action on trigger"
+        },
+        {
             "type": "CheckBox",
             "name": "DisplayRemaining",
             "caption": "Display remaing time",
