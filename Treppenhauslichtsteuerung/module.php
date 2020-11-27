@@ -43,6 +43,13 @@ class Treppenhauslichtsteuerung extends IPSModule
             $this->UnregisterReference($referenceID);
         }
 
+        //Delete all registrations in order to readd them
+        foreach ($this->GetMessageList() as $senderID => $messages) {
+            foreach ($messages as $message) {
+                $this->UnregisterMessage($senderID, $message);
+            }
+        }
+
         //Transfer legacy data
         $transferProperty = function ($legacy, $new)
         {
