@@ -16,6 +16,8 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 * Auswahl von Ein- und Ausgabevariablen in einer Liste.
 * Auswahl der Dauer bevor das Licht ausgeschaltet wird.
+* Angabe der Helligkeit in Abhängigkeit einer Nacht-Modus Variable
+* .Reversed Profile werden sowohl für Ein- als auch Ausgabevariablen unterstützt
 * Möglichkeit die verbleibende Zeit bis zum Auschalten anzuzeigen.
 
 ### 2. Voraussetzungen
@@ -35,13 +37,17 @@ Nachdem ein Auslöser aktiviert wird, geht das Licht im Treppenhaus an. Wird der
 
 __Konfigurationsseite__:
 
-Name                      | Beschreibung
-------------------------- | ---------------------------------
-Eingabesensoren           | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
-Ausgabevariablen          | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden akiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
-Dauer                     | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
-Restlaufzeit anzeigen     | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
-Aktualisierungsintervall  | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
+Name                            | Beschreibung
+------------------------------- | ---------------------------------
+Eingabesensoren                 | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
+Ausgabevariablen                | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden akiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
+Dauer                           | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
+Nacht-Modus (Aktiv)             | Gibt die Variable an, welche angibt, ob der Nacht-Modus aktiv ist. Beispiel ist eine Variable die TRUE geschaltet wird, sobald man schlafen geht.
+Nacht-Modus (Aktiv-Invertieren) | Gibt an, ob der Wert der Nacht-Modus Variable invertiert werden soll. Dies ist notwendig, wenn die Ist-Tag Variable von der Location Instanz verwendet werden soll. Diese ist nämlich FALSE, wenn es Dunkel ist.
+Nacht-Modus (Helligkeit)        | Gibt die Helligkeit in Prozent an, auf die beim Aktivieren geschaltet werden soll.
+Aktion erneut senden            | Wenn ein unzuverlässiges Funk-System verwendet wird, so ist es ggf. erforderlich bei jedem Impuls die Aktion zu senden. Im Normalfall sollte diese Option deaktiviert bleiben, da ständiges senden der Aktion bei Funk-Aktoren ggf. den Duty-Cycle aufbrauchen kann. 
+Restlaufzeit anzeigen           | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
+Aktualisierungsintervall        | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
 
 ### 5. Statusvariablen und Profile
 
