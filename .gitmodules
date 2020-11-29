@@ -4,3 +4,6 @@
 [submodule "tests/stubs"]
 	path = tests/stubs
 	url = https://github.com/symcon/SymconStubs
+[submodule "Treppenhauslichtsteuerung/helper"]
+	path = Treppenhauslichtsteuerung/helper
+	url = https://github.com/symcon/SymconHelper

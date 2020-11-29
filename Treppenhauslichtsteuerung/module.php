@@ -1,10 +1,14 @@
 <?php
 
 declare(strict_types=1);
-define('THL_INPUT', 0);
-define('THL_OUTPUT', 1);
+
+include_once __DIR__ . '/helper/autoload.php';
+
 class Treppenhauslichtsteuerung extends IPSModule
 {
+    use HelperSwitchDevice;
+    use HelperDimDevice;
+
     public function Create()
     {
         //Never delete this line!
@@ -16,7 +20,10 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyInteger('Duration', 1);
         $this->RegisterPropertyBoolean('DisplayRemaining', false);
         $this->RegisterPropertyInteger('UpdateInterval', 10);
-        $this->RegisterPropertyBoolean('ResentAction', false);
+        $this->RegisterPropertyBoolean('ResendAction', false);
+        $this->RegisterPropertyInteger('NightModeSource', 0);
+        $this->RegisterPropertyBoolean('NightModeInverted', false);
+        $this->RegisterPropertyInteger('NightModeValue', 30);
 
         //Registering legacy properties to transfer the data
         $this->RegisterPropertyInteger('InputTriggerID', 0);
@@ -36,19 +43,8 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Never delete this line!
         parent::ApplyChanges();
 
-        $this->SetStatus(IS_ACTIVE);
-
-        //Delete all references in order to readd them
-        foreach ($this->GetReferenceList() as $referenceID) {
-            $this->UnregisterReference($referenceID);
-        }
-
-        //Delete all registrations in order to readd them
-        foreach ($this->GetMessageList() as $senderID => $messages) {
-            foreach ($messages as $message) {
-                $this->UnregisterMessage($senderID, $message);
-            }
-        }
+        //Register variable if enabled
+        $this->MaintainVariable('Remaining', $this->Translate('Remaining time'), VARIABLETYPE_STRING, '', 10, $this->ReadPropertyBoolean('DisplayRemaining'));
 
         //Transfer legacy data
         $transferProperty = function ($legacy, $new)
@@ -72,119 +68,105 @@ class Treppenhauslichtsteuerung extends IPSModule
             return;
         }
 
-        //Checking input sensors and register update messages
+        //Delete all references in order to readd them
+        foreach ($this->GetReferenceList() as $referenceID) {
+            $this->UnregisterReference($referenceID);
+        }
+
+        //Delete all registrations in order to readd them
+        foreach ($this->GetMessageList() as $senderID => $messages) {
+            foreach ($messages as $message) {
+                $this->UnregisterMessage($senderID, $message);
+            }
+        }
+
+        //Register update messages and references
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-
-        //Inactive if no sensors
-        if (count($inputTriggers) > 0) {
-            $inputError = true;
-            $InputErrorCode = IS_ACTIVE;
-            foreach ($inputTriggers as $inputTrigger) {
-                $triggerID = $inputTrigger['VariableID'];
-                $InputErrorCode = $this->checkVariable($triggerID, THL_INPUT);
-                if ($InputErrorCode == 0) {
-                    $this->RegisterMessage($triggerID, VM_UPDATE);
-                    $this->RegisterReference($triggerID);
-                    $inputError = false;
-                }
-            }
-            if ($inputError) {
-                $this->SetStatus(IS_EBASE);
-            }
-        } else {
-            $this->SetStatus(IS_INACTIVE);
+        foreach ($inputTriggers as $inputTrigger) {
+            $triggerID = $inputTrigger['VariableID'];
+            $this->RegisterMessage($triggerID, VM_UPDATE);
+            $this->RegisterReference($triggerID);
         }
-
-        //Checking output variables
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
-
-        //Inactive if no output
-        if (count($outputVariables) > 0) {
-            $outputError = true;
-            $OutputErrorCode = IS_ACTIVE;
-            foreach ($outputVariables as $outputVariable) {
-                $outputID = $outputVariable['VariableID'];
-                $OutputErrorCode = $this->checkVariable($outputID, THL_OUTPUT);
-                if ($OutputErrorCode == 0) {
-                    $outputError = false;
-                }
-            }
-            if ($outputError) {
-                $this->SetStatus(IS_EBASE);
-            }
-        } else {
-            $this->SetStatus(IS_INACTIVE);
+        foreach ($outputVariables as $outputVariable) {
+            $outputID = $outputVariable['VariableID'];
+            $this->RegisterReference($outputID);
         }
-
-        $this->MaintainVariable('Remaining', $this->Translate('Remaining time'), VARIABLETYPE_STRING, '', 10, $this->ReadPropertyBoolean('DisplayRemaining'));
     }
 
     public function GetConfigurationForm()
     {
-        $errorsToString = function (array $list, int $type)
-        {
-            $errors = [];
-            foreach ($list as $variable) {
-                $variableID = $variable['VariableID'];
-                $errorCode = $this->checkVariable($variableID, $type);
-                if ($errorCode != 0) {
-                    if (!in_array($errorCode, $errors)) {
-                        $errors[$errorCode] = [];
-                    }
-                    $errors[$errorCode][] = $variableID;
-                }
-            }
-            $labelCaption = '';
-            foreach ($errors as $error => $variables) {
-                switch ($error) {
-                    case 200:
-                        $labelCaption .= $this->Translate('The following output variables must not be a string variable. Please select a non-string variable.') . PHP_EOL;
-                        break;
-                    case 201:
-                        $labelCaption .= $this->Translate('The following output variables do not exist.') . PHP_EOL;
-                        break;
-                    case 202:
-                        $labelCaption .= $this->Translate('The following input sensors do not exist.') . PHP_EOL;
-                        break;
-                    case 203:
-                        $labelCaption .= $this->Translate('The following output variables have no action.') . PHP_EOL;
-                        break;
-                    default:
-                    $labelCaption .= $this->Translate('The following variables have unknown errors.') . PHP_EOL;
-                    break;
-                }
-                foreach ($variables as $variable) {
-                    if (!IPS_VariableExists($variable)) {
-                        $labelCaption .= '  - ' . sprintf($this->Translate("The object #%d doesn't exist."), $variable) . PHP_EOL;
-                    } else {
-                        $labelCaption .= '  - ' . IPS_GetLocation($variable) . PHP_EOL;
-                    }
-                }
-            }
-            return $labelCaption;
-        };
         //Add options to form
         $jsonForm = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
+        //Set status column for inputs
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-        $errorsInput = $errorsToString($inputTriggers, THL_INPUT);
-
-        $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
-        $errorsOutput = $errorsToString($outputVariables, THL_OUTPUT);
-        if (($errorsInput != '') || ($errorsOutput != '')) {
-            $jsonForm['elements'][0]['caption'] = $errorsInput . $errorsOutput;
-            $jsonForm['elements'][0]['visible'] = true;
+        foreach ($inputTriggers as $inputTrigger) {
+            $triggerID = $inputTrigger['VariableID'];
+            if (!IPS_VariableExists($triggerID)) {
+                $status = 'Missing';
+            } elseif (IPS_GetVariable($triggerID)['VariableType'] == VARIABLETYPE_STRING) {
+                $status = 'Bool/Int/Float required';
+            } else {
+                $status = 'OK';
+            }
+            $jsonForm['elements'][0]['values'][] = [
+                'Status' => $status
+            ];
         }
+
+        //Set status column for outputs
+        $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
+
         //Set visibility of remaining time options
-        $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        $jsonForm['elements'][14]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        foreach ($outputVariables as $outputVariable) {
+            $outputID = $outputVariable['VariableID'];
+            if (!IPS_VariableExists($outputID)) {
+                $status = 'Missing';
+            } else {
+                switch (IPS_GetVariable($outputID)['VariableType']) {
+                    case VARIABLETYPE_BOOLEAN:
+                        $status = self::getSwitchCompatibility($outputID);
+                        break;
+                    case VARIABLETYPE_INTEGER:
+                    case VARIABLETYPE_FLOAT:
+                        $status = self::getDimCompatibility($outputID);
+                        break;
+                    default:
+                        $status = 'Bool/Int/Float required';
+                        break;
+                }
+            }
+            $jsonForm['elements'][1]['values'][] = [
+                'Status' => $status
+            ];
+        }
+
         return json_encode($jsonForm);
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        $start = $this->profileReversed($SenderID) ? !boolval($Data[0]) : boolval($Data[0]);
-        if (($Message == VM_UPDATE) && $start) {
-            $this->Start();
+        if ($Message == VM_UPDATE) {
+            $getProfileName = function ($variableID)
+            {
+                $variable = IPS_GetVariable($variableID);
+                if ($variable['VariableCustomProfile'] != '') {
+                    return $variable['VariableCustomProfile'];
+                } else {
+                    return $variable['VariableProfile'];
+                }
+            };
+
+            $isProfileReversed = function ($VariableID) use ($getProfileName)
+            {
+                return preg_match('/\.Reversed$/', $getProfileName($VariableID));
+            };
+
+            if (boolval($Data[0]) ^ $isProfileReversed($SenderID)) {
+                $this->Start($SenderID);
+            }
         }
     }
 
@@ -206,23 +188,22 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function SetActive(bool $Value)
     {
-        SetValue($this->GetIDForIdent('Active'), $Value);
+        $this->SetValue('Active', $Value);
     }
 
-    public function Start()
+    public function Start($TriggerID)
     {
-        if (!GetValue($this->GetIDForIdent('Active'))) {
+        if (!$this->GetValue('Active')) {
             return;
         }
 
-        if ($this->GetStatus() != IS_ACTIVE) {
-            return;
-        }
+        $this->SwitchVariable(true, $TriggerID);
 
-        $this->SwitchVariable(true);
-
+        //Start OffTimer
         $duration = $this->ReadPropertyInteger('Duration');
         $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
+
+        //Update display variable periodically if enabled
         if ($this->ReadPropertyBoolean('DisplayRemaining')) {
             $this->SetTimerInterval('UpdateRemainingTimer', 1000 * $this->ReadPropertyInteger('UpdateInterval'));
             $this->UpdateRemaining();
@@ -232,7 +213,11 @@ class Treppenhauslichtsteuerung extends IPSModule
     public function Stop()
     {
         $this->SwitchVariable(false);
+
+        //Disable OffTimer
         $this->SetTimerInterval('OffTimer', 0);
+
+        //Disable updating of display variable
         if ($this->ReadPropertyBoolean('DisplayRemaining')) {
             $this->SetTimerInterval('UpdateRemainingTimer', 0);
             $this->SetValue('Remaining', '00:00:00');
@@ -241,129 +226,61 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     public function UpdateRemaining()
     {
-        $remainingID = $this->GetIDForIdent('Remaining');
-        $nexRun = 0;
-        $timers = IPS_GetTimerList();
-
-        //Get NextRun of "OffTimer"
-        foreach ($timers as $timerID) {
+        $secondsRemaining = 0;
+        foreach (IPS_GetTimerList() as $timerID) {
             $timer = IPS_GetTimer($timerID);
             if (($timer['InstanceID'] == $this->InstanceID) && ($timer['Name'] == 'OffTimer')) {
-                $nextRun = $timer['NextRun'];
+                $secondsRemaining = $timer['NextRun'] - time();
                 break;
             }
         }
-        $secondsRemaining = $nextRun - time();
 
-        //Dispaly remaining time as string
+        //Display remaining time as string
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
 
-    private function SwitchVariable(bool $Value)
+    private function SwitchVariable(bool $Value, int $TriggerID = 0)
     {
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
         foreach ($outputVariables as $outputVariable) {
             $outputID = $outputVariable['VariableID'];
-            if ($this->checkVariable($outputID, THL_OUTPUT) != 0) {
+
+            //Prevent endless loops and do not switch output if it was the trigger
+            if ($outputID == $TriggerID) {
                 continue;
             }
 
-            $isReversed = $this->profileReversed($outputID);
-            $targetValue = $isReversed ? !boolval($Value) : boolval($Value);
-
-            //If target and trigger are equal we need to check if switching is required to prevent an endless loop
-            $isTrigger = function (int $outputID)
-            {
-                $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
-                foreach ($inputTriggers as $variable) {
-                    if ($variable['VariableID'] == $outputID) {
-                        return true;
+            //Depending on the type we need to switch differently
+            switch (IPS_GetVariable($outputID)['VariableType']) {
+                case VARIABLETYPE_BOOLEAN:
+                    if ($this->ReadPropertyBoolean('ResendAction') || (self::getSwitchValue($outputID) != $Value)) {
+                        self::switchDevice($outputID, $Value);
                     }
-                }
-                return false;
-            };
-            if ($isTrigger($outputID) && ($targetValue == GetValue($outputID))) {
-                continue;
-            }
+                    break;
+                case VARIABLETYPE_INTEGER:
+                case VARIABLETYPE_FLOAT:
+                    $dimDevice = function ($Value) use ($outputID)
+                    {
+                        if ($this->ReadPropertyBoolean('ResendAction') || (self::getDimValue($outputID) != $Value)) {
+                            self::dimDevice($outputID, $Value);
+                        }
+                    };
 
-            //Check if action should be resent
-            if (!$this->ReadPropertyBoolean('ResentAction') && ($targetValue == GetValue($outputID))) {
-                continue;
-            }
-
-            //Update the output
-            $outputVariable = IPS_GetVariable($outputID);
-            if ($outputVariable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                RequestAction($outputID, $targetValue);
-            } else {
-                //If we are enabling analog devices we want to switch to the maximum value (e.g. 100%)
-                $profile = IPS_GetVariableProfile($this->GetProfileName($outputVariable));
-
-                $maxValue = $profile['MaxValue'];
-                $minValue = $profile['MinValue'];
-
-                $actionValue = $targetValue ? $maxValue : $minValue;
-                RequestAction($outputID, $actionValue);
-            }
-        }
-    }
-
-    private function GetProfileName($variable)
-    {
-        if ($variable['VariableCustomProfile'] != '') {
-            return $variable['VariableCustomProfile'];
-        } else {
-            return $variable['VariableProfile'];
-        }
-    }
-
-    private function checkVariable($variableID, $type)
-    {
-        if (!IPS_VariableExists($variableID)) {
-            switch ($type) {
-                case THL_INPUT:
-                    return IS_EBASE + 2;
-
-                case THL_OUTPUT:
-                    return IS_EBASE + 1;
+                    if ($Value) {
+                        //We might need to set a different value if night-mode is in use
+                        if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
+                            && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
+                            $dimDevice($this->ReadPropertyInteger('NightModeValue'));
+                        } else {
+                            $dimDevice(100);
+                        }
+                    } else {
+                        $dimDevice(0);
+                    }
+                    break;
+                default:
+                    //Unsupported. Do nothing
             }
         }
-        if ($type == THL_OUTPUT) {
-            $variable = IPS_GetVariable($variableID);
-            if ($variable['VariableType'] == VARIABLETYPE_STRING) {
-                return IS_EBASE;
-            }
-
-            if (!HasAction($variableID)) {
-                $this->LogMessage($this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable action. Please choose a variable with a variable action or add a variable action to the output variable.'), KL_WARNING);
-                return IS_EBASE + 3;
-            }
-
-            if ($variable['VariableType'] == VARIABLETYPE_BOOLEAN) {
-                return 0;
-            } else {
-                $profileName = $this->GetProfileName($variable);
-                //Quit if output variable has no profile
-                if (!IPS_VariableProfileExists($profileName)) {
-                    $this->LogMessage($this->Translate('The output variable of the Treppenhauslichtsteuerung has no variable profile. Please choose a variable with a variable profile or add a variable profile to the output variable.'), KL_WARNING);
-                    return IS_EBASE + 4;
-                }
-                $maxValue = IPS_GetVariableProfile($profileName)['MaxValue'];
-                $minValue = IPS_GetVariableProfile($profileName)['MinValue'];
-
-                //Quit if min is greater than max value
-                if ($maxValue - $minValue <= 0) {
-                    $this->LogMessage($this->Translate('The profile of the output variable has no defined max value. Please update the max value or choose another profile.'), KL_WARNING);
-                    return IS_EBASE + 5;
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    private function profileReversed($VariableID)
-    {
-        return substr($this->GetProfileName(IPS_GetVariable($VariableID)), -strlen('.Reversed')) === '.Reversed';
     }
 }

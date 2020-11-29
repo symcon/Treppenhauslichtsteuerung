@@ -1,36 +1,10 @@
 {
-    "elements":
-    [
-    {
-        "type": "Label",
-        "name": "ErrorLabel",
-        "caption": "",
-        "visible": false
-    },
-    {
-        "type": "List",
-        "name": "InputTriggers",
-        "caption": "Input Sensors",
-        "add": true, 
-        "delete": true,
-        "rowCount": 4,
-        "columns": [
-            {
-                "name": "VariableID",
-                "caption": "Variable",
-                "width": "auto",
-                "add": 0,
-                "edit": {
-                    "type": "SelectVariable"
-                }
-            }
-        ]
-        },
+    "elements": [
         {
             "type": "List",
-            "name": "OutputVariables",
-            "caption": "Output Variables",
-            "add": true, 
+            "name": "InputTriggers",
+            "caption": "Input Sensors",
+            "add": true,
             "delete": true,
             "rowCount": 4,
             "columns": [
@@ -42,6 +16,37 @@
                     "edit": {
                         "type": "SelectVariable"
                     }
+                },
+                {
+                    "name": "Status",
+                    "caption": "Status",
+                    "width": "100px",
+                    "add": "New"
+                }
+            ]
+        },
+        {
+            "type": "List",
+            "name": "OutputVariables",
+            "caption": "Output Variables",
+            "add": true,
+            "delete": true,
+            "rowCount": 4,
+            "columns": [
+                {
+                    "name": "VariableID",
+                    "caption": "Variable",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "name": "Status",
+                    "caption": "Status",
+                    "width": "100px",
+                    "add": "New"
                 }
             ]
         },
@@ -53,6 +58,39 @@
         },
         {
             "type": "Label",
+            "caption": ""
+        },
+        {
+            "type": "Label",
+            "caption": "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)"
+        },
+        {
+            "type": "SelectVariable",
+            "name": "NightModeSource",
+            "caption": "Active (Night Mode)",
+            "suffix": "minutes"
+        },
+        {
+            "type": "Label",
+            "caption": "Invert value of night-mode active variable (required if IsDay variable from Location is used)"
+        },
+        {
+            "type": "CheckBox",
+            "name": "NightModeInverted",
+            "caption": "Inverted"
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "NightModeValue",
+            "caption": "Brightness (Night Mode)",
+            "suffix": "%"
+        },
+        {
+            "type": "Label",
+            "caption": ""
+        },
+        {
+            "type": "Label",
             "caption": "For unreliable or timed devices it might be required to resent the action on each trigger"
         },
         {
@@ -61,35 +99,25 @@
             "caption": "Resent action on trigger"
         },
         {
+            "type": "Label",
+            "caption": ""
+        },
+        {
             "type": "CheckBox",
             "name": "DisplayRemaining",
             "caption": "Display remaing time",
             "onChange": "THL_ToggleDisplayInterval($id, $DisplayRemaining);"
         },
         {
-            "type": "NumberSpinner", 
-            "name": "UpdateInterval", 
+            "type": "NumberSpinner",
+            "name": "UpdateInterval",
             "caption": "Update Interval",
             "suffix": "Seconds"
         }
     ],
-    "status":
-    [
-        {
-            "code": 104,
-            "icon": "inactive",
-            "caption": "Both lists need to be populated."
-        },
-        {
-            "code": 200,
-            "icon": "error",
-            "caption": "The instance is erroneous."
-        }
-    ],
     "actions": [
         {
-            "type":
-            "TestCenter"
+            "type": "TestCenter"
         }
     ]
 }
