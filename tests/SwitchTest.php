@@ -42,6 +42,103 @@ class SwitchTest extends TestCase
         parent::setUp();
     }
 
+    public function testValidConfiguration(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //Create Trigger
+        $tv_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+
+        //Create Action
+        $scriptID = IPS_CreateScript(0 /* PHP */);
+        IPS_SetScriptContent($scriptID, 'SetValue($_IPS[\'VARIABLE\'], $_IPS[\'VALUE\']);');
+
+        //Create Output
+        $ov_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+        IPS_SetVariableCustomAction($ov_id, $scriptID);
+
+        //Setup Trigger and Output
+        IPS_SetProperty($iid, 'InputTriggers', json_encode([[
+            'VariableID' => $tv_id
+        ]]));
+        IPS_SetProperty($iid, 'OutputVariables', json_encode([[
+            'VariableID' => $ov_id
+        ]]));
+        IPS_ApplyChanges($iid);
+
+        //The output needs to be enabled
+        $this->assertEquals(IS_ACTIVE, IPS_GetInstance($iid)['InstanceStatus']);
+    }
+
+    public function testInvalidConfigurationEmpty(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //The output needs to be enabled
+        $this->assertEquals(IS_INACTIVE, IPS_GetInstance($iid)['InstanceStatus']);
+    }
+
+    public function testInvalidConfigurationNoTrigger(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //Create Action
+        $scriptID = IPS_CreateScript(0 /* PHP */);
+        IPS_SetScriptContent($scriptID, 'SetValue($_IPS[\'VARIABLE\'], $_IPS[\'VALUE\']);');
+
+        //Create Output
+        $ov_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+        IPS_SetVariableCustomAction($ov_id, $scriptID);
+
+        IPS_SetProperty($iid, 'OutputVariables', json_encode([[
+            'VariableID' => $ov_id
+        ]]));
+        IPS_ApplyChanges($iid);
+
+        //The output needs to be enabled
+        $this->assertEquals(IS_INACTIVE, IPS_GetInstance($iid)['InstanceStatus']);
+    }
+
+    public function testInvalidConfigurationNoOutput(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //Create Trigger
+        $tv_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+
+        //Setup Trigger and Output
+        IPS_SetProperty($iid, 'InputTriggers', json_encode([[
+            'VariableID' => $tv_id
+        ]]));
+        IPS_ApplyChanges($iid);
+
+        //The output needs to be enabled
+        $this->assertEquals(IS_INACTIVE, IPS_GetInstance($iid)['InstanceStatus']);
+    }
+
+    public function testInvalidConfigurationInvalidOutput(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //Create Trigger
+        $tv_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+
+        //Create Output
+        $ov_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+
+        //Setup Trigger and Output
+        IPS_SetProperty($iid, 'InputTriggers', json_encode([[
+            'VariableID' => $tv_id
+        ]]));
+        IPS_SetProperty($iid, 'OutputVariables', json_encode([[
+            'VariableID' => $ov_id
+        ]]));
+        IPS_ApplyChanges($iid);
+
+        //The output needs to be enabled
+        $this->assertEquals(IS_INACTIVE, IPS_GetInstance($iid)['InstanceStatus']);
+    }
+
     public function testSwitchBoolean(): void
     {
         $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');

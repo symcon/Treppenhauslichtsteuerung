@@ -92,6 +92,33 @@ class Treppenhauslichtsteuerung extends IPSModule
             $outputID = $outputVariable['VariableID'];
             $this->RegisterReference($outputID);
         }
+
+        //Check status column for inputs
+        $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
+        $inputTriggerOkCount = 0;
+        foreach ($inputTriggers as $inputTrigger) {
+            if ($this->GetTriggerStatus($inputTrigger['VariableID']) == 'OK') {
+                $inputTriggerOkCount++;
+            }
+        }
+
+        //Check status column for outputs
+        $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
+        $outputVariablesOkCount = 0;
+        foreach ($outputVariables as $outputVariable) {
+            if ($this->GetOutputStatus($outputVariable['VariableID']) == 'OK') {
+                $outputVariablesOkCount++;
+            }
+        }
+
+        //If we are missing triggers or outputs the instance will not work
+        if (($inputTriggerOkCount == 0) || ($outputVariablesOkCount == 0)) {
+            $status = IS_INACTIVE;
+        } else {
+            $status = IS_ACTIVE;
+        }
+
+        $this->SetStatus($status);
     }
 
     public function GetConfigurationForm()
@@ -102,46 +129,21 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Set status column for inputs
         $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
         foreach ($inputTriggers as $inputTrigger) {
-            $triggerID = $inputTrigger['VariableID'];
-            if (!IPS_VariableExists($triggerID)) {
-                $status = 'Missing';
-            } elseif (IPS_GetVariable($triggerID)['VariableType'] == VARIABLETYPE_STRING) {
-                $status = 'Bool/Int/Float required';
-            } else {
-                $status = 'OK';
-            }
             $jsonForm['elements'][0]['values'][] = [
-                'Status' => $status
+                'Status' => $this->GetTriggerStatus($inputTrigger['VariableID'])
             ];
         }
 
         //Set status column for outputs
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
+        foreach ($outputVariables as $outputVariable) {
+            $jsonForm['elements'][1]['values'][] = [
+                'Status' => $this->GetOutputStatus($outputVariable['VariableID'])
+            ];
+        }
 
         //Set visibility of remaining time options
         $jsonForm['elements'][14]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
-        foreach ($outputVariables as $outputVariable) {
-            $outputID = $outputVariable['VariableID'];
-            if (!IPS_VariableExists($outputID)) {
-                $status = 'Missing';
-            } else {
-                switch (IPS_GetVariable($outputID)['VariableType']) {
-                    case VARIABLETYPE_BOOLEAN:
-                        $status = self::getSwitchCompatibility($outputID);
-                        break;
-                    case VARIABLETYPE_INTEGER:
-                    case VARIABLETYPE_FLOAT:
-                        $status = self::getDimCompatibility($outputID);
-                        break;
-                    default:
-                        $status = 'Bool/Int/Float required';
-                        break;
-                }
-            }
-            $jsonForm['elements'][1]['values'][] = [
-                'Status' => $status
-            ];
-        }
 
         return json_encode($jsonForm);
     }
@@ -237,6 +239,34 @@ class Treppenhauslichtsteuerung extends IPSModule
 
         //Display remaining time as string
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
+    }
+
+    private function GetTriggerStatus($triggerID)
+    {
+        if (!IPS_VariableExists($triggerID)) {
+            return 'Missing';
+        } elseif (IPS_GetVariable($triggerID)['VariableType'] == VARIABLETYPE_STRING) {
+            return 'Bool/Int/Float required';
+        } else {
+            return 'OK';
+        }
+    }
+
+    private function GetOutputStatus($outputID)
+    {
+        if (!IPS_VariableExists($outputID)) {
+            return 'Missing';
+        } else {
+            switch (IPS_GetVariable($outputID)['VariableType']) {
+                case VARIABLETYPE_BOOLEAN:
+                    return self::getSwitchCompatibility($outputID);
+                case VARIABLETYPE_INTEGER:
+                case VARIABLETYPE_FLOAT:
+                    return self::getDimCompatibility($outputID);
+                default:
+                    return 'Bool/Int/Float required';
+            }
+        }
     }
 
     private function SwitchVariable(bool $Value, int $TriggerID = 0)
