@@ -271,27 +271,42 @@ class Treppenhauslichtsteuerung extends IPSModule
 
     private function SwitchVariable(bool $Value, int $TriggerID = 0)
     {
+        $isTrigger = function (int $outputID)
+        {
+            $inputTriggers = json_decode($this->ReadPropertyString('InputTriggers'), true);
+            foreach ($inputTriggers as $variable) {
+                if ($variable['VariableID'] == $outputID) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         $outputVariables = json_decode($this->ReadPropertyString('OutputVariables'), true);
         foreach ($outputVariables as $outputVariable) {
             $outputID = $outputVariable['VariableID'];
 
-            //Prevent endless loops and do not switch output if it was the trigger
-            if ($outputID == $TriggerID) {
-                continue;
+            $doResend = $this->ReadPropertyBoolean('ResendAction');
+
+            //Prevent endless loops and do not allow resends if outputID is also a trigger
+            if ($doResend) {
+                if ($isTrigger($outputID)) {
+                    $doResend = false;
+                }
             }
 
             //Depending on the type we need to switch differently
             switch (IPS_GetVariable($outputID)['VariableType']) {
                 case VARIABLETYPE_BOOLEAN:
-                    if ($this->ReadPropertyBoolean('ResendAction') || (self::getSwitchValue($outputID) != $Value)) {
+                    if ($doResend || (self::getSwitchValue($outputID) != $Value)) {
                         self::switchDevice($outputID, $Value);
                     }
                     break;
                 case VARIABLETYPE_INTEGER:
                 case VARIABLETYPE_FLOAT:
-                    $dimDevice = function ($Value) use ($outputID)
+                    $dimDevice = function ($Value) use ($outputID, $doResend)
                     {
-                        if ($this->ReadPropertyBoolean('ResendAction') || (self::getDimValue($outputID) != $Value)) {
+                        if ($doResend || (self::getDimValue($outputID) != $Value)) {
                             self::dimDevice($outputID, $Value);
                         }
                     };

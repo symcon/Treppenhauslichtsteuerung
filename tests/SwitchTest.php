@@ -284,7 +284,7 @@ class SwitchTest extends TestCase
         $interface = IPS\InstanceManager::getInstanceInterface($iid);
         $interface->MessageSink(strtotime('01.01.2000'), $tv_id, VM_UPDATE, [true]);
 
-        //The output needs to be enabled
+        //The output needs to be disabled (reversed => true)
         $this->assertFalse(GetValue($ov_id));
         $this->assertNotEquals(0, IPS_GetVariable($ov_id)['VariableUpdated']);
     }
@@ -449,7 +449,7 @@ class SwitchTest extends TestCase
         $this->assertEquals(floor(255 / 100 * 70), GetValue($ov_id));
     }
 
-    public function testDoNotSwitchIfTriggerIDIsOutputID(): void
+    public function testDoNotSwitchAgainIfTriggerIDIsOutputID(): void
     {
         $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
 
@@ -462,6 +462,7 @@ class SwitchTest extends TestCase
 
         //Create Trigger
         $tv_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+        IPS_SetVariableCustomProfile($tv_id, '~Switch.Reversed');
         IPS_SetVariableCustomAction($tv_id, $scriptID);
 
         //Setup Trigger and Output
@@ -471,13 +472,20 @@ class SwitchTest extends TestCase
         IPS_SetProperty($iid, 'OutputVariables', json_encode([[
             'VariableID' => $tv_id
         ]]));
+
+        //Enable explicit resending of same action values
+        IPS_SetProperty($iid, 'ResendAction', true);
+
         IPS_ApplyChanges($iid);
 
         //Simulate a trigger change
         $interface = IPS\InstanceManager::getInstanceInterface($iid);
-        $interface->MessageSink(strtotime('01.01.2000'), $tv_id, VM_UPDATE, [true]);
+        $interface->MessageSink(strtotime('01.01.2000'), $tv_id, VM_UPDATE, [false]);
 
-        //The output needs to be enabled
+        //The output needs to be disabled (reversed => true)
         $this->assertFalse(GetValue($tv_id));
+
+        //The output should not have been changed
+        $this->assertEquals(0, IPS_GetVariable($tv_id)['VariableUpdated']);
     }
 }
