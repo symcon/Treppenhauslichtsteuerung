@@ -57,37 +57,41 @@
             "suffix": "minutes"
         },
         {
-            "type": "Label",
-            "caption": ""
-        },
-        {
-            "type": "Label",
-            "caption": "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)"
-        },
-        {
-            "type": "SelectVariable",
-            "name": "NightModeSource",
-            "caption": "Active (Night Mode)",
-            "suffix": "minutes"
-        },
-        {
-            "type": "Label",
-            "caption": "Invert value of night-mode active variable (required if IsDay variable from Location is used)"
-        },
-        {
-            "type": "CheckBox",
-            "name": "NightModeInverted",
-            "caption": "Inverted"
-        },
-        {
-            "type": "NumberSpinner",
-            "name": "NightModeValue",
-            "caption": "Brightness (Night Mode)",
-            "suffix": "%"
-        },
-        {
-            "type": "Label",
-            "caption": ""
+            "type": "ExpansionPanel",
+            "caption": "Night/Day Mode",
+            "items": [
+                {
+                    "type": "Label",
+                    "caption": "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "NightModeSource",
+                    "caption": "Active (Night Mode)",
+                    "suffix": "minutes"
+                },
+                {
+                    "type": "Label",
+                    "caption": "Invert value of night-mode active variable (required if IsDay variable from Location is used)"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "NightModeInverted",
+                    "caption": "Inverted"
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "NightModeValue",
+                    "caption": "Brightness (Night Mode)",
+                    "suffix": "%"
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "DayModeValue",
+                    "caption": "Brightness (Day Mode)",
+                    "suffix": "%"
+                }
+            ]
         },
         {
             "type": "Label",
@@ -97,10 +101,6 @@
             "type": "CheckBox",
             "name": "ResendAction",
             "caption": "Resend action on trigger"
-        },
-        {
-            "type": "Label",
-            "caption": ""
         },
         {
             "type": "CheckBox",

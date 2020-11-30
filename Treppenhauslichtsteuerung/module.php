@@ -24,6 +24,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyInteger('NightModeSource', 0);
         $this->RegisterPropertyBoolean('NightModeInverted', false);
         $this->RegisterPropertyInteger('NightModeValue', 30);
+        $this->RegisterPropertyInteger('DayModeValue', 100);
 
         //Registering legacy properties to transfer the data
         $this->RegisterPropertyInteger('InputTriggerID', 0);
@@ -143,7 +144,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
 
         //Set visibility of remaining time options
-        $jsonForm['elements'][14]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
 
         return json_encode($jsonForm);
     }
@@ -317,7 +318,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                             && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
                             $dimDevice($this->ReadPropertyInteger('NightModeValue'));
                         } else {
-                            $dimDevice(100);
+                            $dimDevice($this->ReadPropertyInteger('DayModeValue'));
                         }
                     } else {
                         $dimDevice(0);

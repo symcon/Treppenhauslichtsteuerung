@@ -23,9 +23,11 @@
             "Variable": "Variable",
             "Resend action on trigger": "Aktion bei jeder Auslösung senden",
             "For unreliable or timed devices it might be required to resent the action on each trigger": "Für unzuverlässige oder zeitgesteurte Geräte kann es erforderlich sein die Aktion bei jeder Auslösung zu senden",
+            "Night/Day Mode": "Nacht-/Tag-Modus",
             "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)": "Benutze eine Boolean Variable, um den Nacht-Modus zu aktivieren/deaktivieren",
             "Active (Night Mode)": "Aktiv (Nacht-Modus)",
             "Brightness (Night Mode)": "Helligkeit (Nacht-Modus)",
+            "Brightness (Day Mode)": "Helligkeit (Tag-Modus)",
             "Inverted": "Invertiert",
             "Invert value of night-mode active variable (required if IsDay variable from Location is used)": "Invertiere Wert der Nacht-Modus Aktiv Variable (Erforderlich wenn die Ist-Tag Variable von der Location Instanz verwendet wird)"
         }
