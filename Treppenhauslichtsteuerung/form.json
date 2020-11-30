@@ -95,8 +95,8 @@
         },
         {
             "type": "CheckBox",
-            "name": "ResentAction",
-            "caption": "Resent action on trigger"
+            "name": "ResendAction",
+            "caption": "Resend action on trigger"
         },
         {
             "type": "Label",

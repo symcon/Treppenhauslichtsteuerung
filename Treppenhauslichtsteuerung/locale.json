@@ -21,7 +21,7 @@
             "The following variables have unknown errors.": "Die folgenden Variablen haben unbekannte Fehler.",
             "The object #%s doesn't exist.": "Das Objekt #%s existiert nicht.",
             "Variable": "Variable",
-            "Resent action on trigger": "Aktion bei jeder Auslösung senden",
+            "Resend action on trigger": "Aktion bei jeder Auslösung senden",
             "For unreliable or timed devices it might be required to resent the action on each trigger": "Für unzuverlässige oder zeitgesteurte Geräte kann es erforderlich sein die Aktion bei jeder Auslösung zu senden",
             "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)": "Benutze eine Boolean Variable, um den Nacht-Modus zu aktivieren/deaktivieren",
             "Active (Night Mode)": "Aktiv (Nacht-Modus)",
