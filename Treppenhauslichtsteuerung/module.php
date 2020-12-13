@@ -168,7 +168,7 @@ class Treppenhauslichtsteuerung extends IPSModule
             };
 
             if (boolval($Data[0]) ^ $isProfileReversed($SenderID)) {
-                $this->Start($SenderID);
+                $this->Start();
             }
         }
     }
@@ -194,13 +194,13 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->SetValue('Active', $Value);
     }
 
-    public function Start($TriggerID)
+    public function Start()
     {
         if (!$this->GetValue('Active')) {
             return;
         }
 
-        $this->SwitchVariable(true, $TriggerID);
+        $this->SwitchVariable(true);
 
         //Start OffTimer
         $duration = $this->ReadPropertyInteger('Duration');
@@ -270,7 +270,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
     }
 
-    private function SwitchVariable(bool $Value, int $TriggerID = 0)
+    private function SwitchVariable(bool $Value)
     {
         $isTrigger = function (int $outputID)
         {
