@@ -184,7 +184,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         }
     }
 
-    public function ToggleDisplayInterval($visible)
+    public function ToggleDisplayInterval(bool $visible)
     {
         $this->UpdateFormField('UpdateInterval', 'visible', $visible);
     }
