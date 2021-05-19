@@ -21,7 +21,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyBoolean('DisplayRemaining', false);
         $this->RegisterPropertyInteger('UpdateInterval', 10);
         $this->RegisterPropertyBoolean('ResendAction', false);
-        $this->RegisterPropertyString('NightMode', 'Off');
+        $this->RegisterPropertyString('NightMode', 'off');
         $this->RegisterPropertyInteger('NightModeSource', 0);
         $this->RegisterPropertyBoolean('NightModeInverted', false);
         $this->RegisterPropertyInteger('NightModeValue', 30);
