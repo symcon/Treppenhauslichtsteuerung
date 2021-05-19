@@ -60,34 +60,78 @@
             "type": "ExpansionPanel",
             "caption": "Night/Day Mode",
             "items": [
+                { "type": "Select",
+                  "name": "NightMode",
+                  "caption": "Night/Day Mode",
+                  "onChange": "THL_setNightMode($id,$NightMode);",
+                  "options": [
+                        { "caption": "Off", "value": "off" },
+                        { "caption": "Night/Day Variable", "value": "boolean" },
+                        { "caption": "Ambient Brightness Variable", "value": "integer" }
+                    ]
+                },
                 {
                     "type": "Label",
+                    "name": "LabelNightModeSource",
+                    "visible": false,
                     "caption": "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)"
                 },
                 {
                     "type": "SelectVariable",
                     "name": "NightModeSource",
                     "caption": "Active (Night Mode)",
+                    "visible": false,
                     "suffix": "minutes"
                 },
                 {
                     "type": "Label",
+                    "name": "LabelNightModeSourceInverted",
+                    "visible": false,
                     "caption": "Invert value of night-mode active variable (required if IsDay variable from Location is used)"
                 },
                 {
                     "type": "CheckBox",
+                    "visible": false,
                     "name": "NightModeInverted",
                     "caption": "Inverted"
                 },
                 {
+                    "type": "Label",
+                    "name": "LabelNightModeSourceInteger",
+                    "visible": false,
+                    "caption": "Use a Integer variable (ambient brightness) to determine if the night mode value should be send (only applicable to dimmable devices)"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "NightModeSourceInteger",
+                    "visible": false,
+                    "caption": "Active (Night Mode)",
+                    "suffix": "minutes"
+                },
+                {
+                    "type": "Label",
+                    "name": "LabelNightModeSourceIntegerThreshold",
+                    "visible": false,
+                    "caption": "Set threshold for the ambient brightness"
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "AmbientBrightnessThreshold",
+                    "visible": false,
+                    "caption": "Ambient Brightness Threshold",
+                    "suffix": " lux"
+				},
+                {
                     "type": "NumberSpinner",
                     "name": "NightModeValue",
+                    "visible": false,
                     "caption": "Brightness (Night Mode)",
                     "suffix": "%"
                 },
                 {
                     "type": "NumberSpinner",
                     "name": "DayModeValue",
+                    "visible": false,
                     "caption": "Brightness (Day Mode)",
                     "suffix": "%"
                 }
