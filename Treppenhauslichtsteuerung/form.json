@@ -63,7 +63,7 @@
                 { "type": "Select",
                   "name": "NightMode",
                   "caption": "Night/Day Mode",
-                  "onChange": "THL_setNightMode($id,$NightMode);",
+                  "onChange": "THL_SetNightMode($id,$NightMode);",
                   "options": [
                         { "caption": "Off", "value": "off" },
                         { "caption": "Night/Day Variable", "value": "boolean" },

@@ -51,7 +51,7 @@ class Treppenhauslichtsteuerung extends IPSModule
         parent::ApplyChanges();
 
         if (!$this->ReadAttributeBoolean('Migrated') && $this->ReadPropertyInteger('NightModeSource')) {
-            $this->setNightMode('boolean');
+            $this->SetNightMode('boolean');
             IPS_SetProperty($this->InstanceID, 'NightMode', 'boolean');
             $this->WriteAttributeBoolean('Migrated', true);
             IPS_ApplyChanges($this->InstanceID);
