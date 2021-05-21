@@ -461,6 +461,11 @@ class Treppenhauslichtsteuerung extends IPSModule
                                     $dimDevice($this->ReadPropertyInteger('DayModeValue'));
                                 }
                                 break;
+
+                            case 'off':
+                                $dimDevice(100);
+                                break;
+
                             default:
                                 //Unsupported. Do nothing
                                 break;
