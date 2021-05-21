@@ -418,7 +418,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                         $dimDevice(0);
                     }
                     break;
-                    
+
                 default:
                     //Unsupported. Do nothing
             }
