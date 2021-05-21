@@ -155,63 +155,24 @@ class Treppenhauslichtsteuerung extends IPSModule
             ];
         }
 
-        //Set visibility of Night/Day mode
-        switch ($this->ReadPropertyString('NightMode')) {
-            case 'off':
-                //NightMode Boolean
-                $jsonForm['elements'][3]['items'][1]['visible'] = false;
-                $jsonForm['elements'][3]['items'][2]['visible'] = false;
-                $jsonForm['elements'][3]['items'][3]['visible'] = false;
-                $jsonForm['elements'][3]['items'][4]['visible'] = false;
+        $hideNightModeElements = function (array $states) use (&$jsonForm)
+        {
+            $jsonForm['elements'][3]['items'][1]['visible'] = !$states[0];
+            $jsonForm['elements'][3]['items'][2]['visible'] = !$states[0];
+            $jsonForm['elements'][3]['items'][3]['visible'] = !$states[0];
+            $jsonForm['elements'][3]['items'][4]['visible'] = !$states[0];
 
-                //NightMode Integer
-                $jsonForm['elements'][3]['items'][5]['visible'] = false;
-                $jsonForm['elements'][3]['items'][6]['visible'] = false;
-                $jsonForm['elements'][3]['items'][7]['visible'] = false;
-                $jsonForm['elements'][3]['items'][8]['visible'] = false;
+            $jsonForm['elements'][3]['items'][5]['visible'] = !$states[1];
+            $jsonForm['elements'][3]['items'][6]['visible'] = !$states[1];
+            $jsonForm['elements'][3]['items'][7]['visible'] = !$states[1];
+            $jsonForm['elements'][3]['items'][8]['visible'] = !$states[1];
 
-                //Brightness
-                $jsonForm['elements'][3]['items'][9]['visible'] = false;
-                $jsonForm['elements'][3]['items'][10]['visible'] = false;
-                break;
-            case 'boolean':
-                //NightMode Boolean
-                $jsonForm['elements'][3]['items'][1]['visible'] = true;
-                $jsonForm['elements'][3]['items'][2]['visible'] = true;
-                $jsonForm['elements'][3]['items'][3]['visible'] = true;
-                $jsonForm['elements'][3]['items'][4]['visible'] = true;
+            $jsonForm['elements'][3]['items'][9]['visible'] = !$states[2];
+            $jsonForm['elements'][3]['items'][10]['visible'] = !$states[2];
+        };
 
-                //NightMode Integer
-                $jsonForm['elements'][3]['items'][5]['visible'] = false;
-                $jsonForm['elements'][3]['items'][6]['visible'] = false;
-                $jsonForm['elements'][3]['items'][7]['visible'] = false;
-                $jsonForm['elements'][3]['items'][8]['visible'] = false;
+        $hideNightModeElements($this->getNightModeDesiredVisibility($this->ReadPropertyString('NightMode')));
 
-                //Brightness
-                $jsonForm['elements'][3]['items'][9]['visible'] = true;
-                $jsonForm['elements'][3]['items'][10]['visible'] = true;
-                break;
-            case 'integer':
-                //NightMode Boolean
-                $jsonForm['elements'][3]['items'][1]['visible'] = false;
-                $jsonForm['elements'][3]['items'][2]['visible'] = false;
-                $jsonForm['elements'][3]['items'][3]['visible'] = false;
-                $jsonForm['elements'][3]['items'][4]['visible'] = false;
-
-                //NightMode Integer
-                $jsonForm['elements'][3]['items'][5]['visible'] = true;
-                $jsonForm['elements'][3]['items'][6]['visible'] = true;
-                $jsonForm['elements'][3]['items'][7]['visible'] = true;
-                $jsonForm['elements'][3]['items'][8]['visible'] = true;
-
-                //Brightness
-                $jsonForm['elements'][3]['items'][9]['visible'] = true;
-                $jsonForm['elements'][3]['items'][10]['visible'] = true;
-                break;
-            default:
-                //Unsupported. Do nothing
-                break;
-        }
         //Set visibility of remaining time options
         $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
 
@@ -311,64 +272,45 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
 
-    public function setNightMode($Value)
+    public function SetNightMode(string $Value)
     {
-        switch ($Value) {
+        $hideNightModeElements = function (array $states)
+        {
+            $this->UpdateFormField('LabelNightModeSource', 'visible', !$states[0]);
+            $this->UpdateFormField('NightModeSource', 'visible', !$states[0]);
+            $this->UpdateFormField('LabelNightModeSourceInverted', 'visible', !$states[0]);
+            $this->UpdateFormField('NightModeInverted', 'visible', !$states[0]);
+
+            $this->UpdateFormField('LabelNightModeSourceInteger', 'visible', !$states[1]);
+            $this->UpdateFormField('NightModeSourceInteger', 'visible', !$states[1]);
+            $this->UpdateFormField('LabelNightModeSourceIntegerThreshold', 'visible', !$states[1]);
+            $this->UpdateFormField('AmbientBrightnessThreshold', 'visible', !$states[1]);
+
+            $this->UpdateFormField('NightModeValue', 'visible', !$states[2]);
+            $this->UpdateFormField('DayModeValue', 'visible', !$states[2]);
+        };
+
+        $hideNightModeElements($this->getNightModeDesiredVisibility($Value));
+    }
+
+    private function getNightModeDesiredVisibility($nightMode)
+    {
+        switch ($nightMode) {
             case 'off':
-                //NightMode Boolean
-                $this->UpdateFormField('LabelNightModeSource', 'visible', false);
-                $this->UpdateFormField('NightModeSource', 'visible', false);
-                $this->UpdateFormField('LabelNightModeSourceInverted', 'visible', false);
-                $this->UpdateFormField('NightModeInverted', 'visible', false);
+                return [true, true, true];
+            break;
 
-                //NightMode Integer
-                $this->UpdateFormField('LabelNightModeSourceInteger', 'visible', false);
-                $this->UpdateFormField('NightModeSourceInteger', 'visible', false);
-                $this->UpdateFormField('LabelNightModeSourceIntegerThreshold', 'visible', false);
-                $this->UpdateFormField('AmbientBrightnessThreshold', 'visible', false);
-
-                //Brightness
-                $this->UpdateFormField('NightModeValue', 'visible', false);
-                $this->UpdateFormField('DayModeValue', 'visible', false);
-                break;
             case 'boolean':
-                //NightMode Boolean
-                $this->UpdateFormField('LabelNightModeSource', 'visible', true);
-                $this->UpdateFormField('NightModeSource', 'visible', true);
-                $this->UpdateFormField('LabelNightModeSourceInverted', 'visible', true);
-                $this->UpdateFormField('NightModeInverted', 'visible', true);
+                return [false, true, false];
+            break;
 
-                //NightMode Integer
-                $this->UpdateFormField('LabelNightModeSourceInteger', 'visible', false);
-                $this->UpdateFormField('NightModeSourceInteger', 'visible', false);
-                $this->UpdateFormField('LabelNightModeSourceIntegerThreshold', 'visible', false);
-                $this->UpdateFormField('AmbientBrightnessThreshold', 'visible', false);
-
-                //Brightness
-                $this->UpdateFormField('NightModeValue', 'visible', true);
-                $this->UpdateFormField('DayModeValue', 'visible', true);
-
-                break;
             case 'integer':
-                //NightMode Boolean
-                $this->UpdateFormField('LabelNightModeSource', 'visible', false);
-                $this->UpdateFormField('NightModeSource', 'visible', false);
-                $this->UpdateFormField('LabelNightModeSourceInverted', 'visible', false);
-                $this->UpdateFormField('NightModeInverted', 'visible', false);
+                return [true, false, false];
+            break;
 
-                //NightMode Integer
-                $this->UpdateFormField('LabelNightModeSourceInteger', 'visible', true);
-                $this->UpdateFormField('NightModeSourceInteger', 'visible', true);
-                $this->UpdateFormField('LabelNightModeSourceIntegerThreshold', 'visible', true);
-                $this->UpdateFormField('AmbientBrightnessThreshold', 'visible', true);
-
-                //Brightness
-                $this->UpdateFormField('NightModeValue', 'visible', true);
-                $this->UpdateFormField('DayModeValue', 'visible', true);
-                break;
             default:
                 //Unsupported. Do nothing
-                break;
+                return false;
         }
     }
 
@@ -433,6 +375,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                         self::switchDevice($outputID, $Value);
                     }
                     break;
+
                 case VARIABLETYPE_INTEGER:
                 case VARIABLETYPE_FLOAT:
                     $dimDevice = function ($Value) use ($outputID, $doResend)
@@ -453,6 +396,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                                     $dimDevice($this->ReadPropertyInteger('DayModeValue'));
                                 }
                                 break;
+
                             case 'integer':
                                 if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSourceInteger'))
                                 && (GetValue($this->ReadPropertyInteger('NightModeSourceInteger')) < $this->ReadPropertyInteger('AmbientBrightnessThreshold'))) {
@@ -474,6 +418,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                         $dimDevice(0);
                     }
                     break;
+                    
                 default:
                     //Unsupported. Do nothing
             }
