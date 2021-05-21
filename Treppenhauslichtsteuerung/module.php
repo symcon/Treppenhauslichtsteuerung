@@ -40,12 +40,22 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Variables
         $this->RegisterVariableBoolean('Active', 'Treppenhauslichtsteuerung aktiv', '~Switch');
         $this->EnableAction('Active');
+
+        //Attributes
+        $this->RegisterAttributeBoolean('Migrated', false);
     }
 
     public function ApplyChanges()
     {
         //Never delete this line!
         parent::ApplyChanges();
+
+        if (!$this->ReadAttributeBoolean('Migrated') && $this->ReadPropertyInteger('NightModeSource')) {
+            $this->setNightMode('boolean');
+            IPS_SetProperty($this->InstanceID, 'NightMode', 'boolean');
+            $this->WriteAttributeBoolean('Migrated', true);
+            IPS_ApplyChanges($this->InstanceID);
+        }
 
         //Register variable if enabled
         $this->MaintainVariable('Remaining', $this->Translate('Remaining time'), VARIABLETYPE_STRING, '', 10, $this->ReadPropertyBoolean('DisplayRemaining'));
