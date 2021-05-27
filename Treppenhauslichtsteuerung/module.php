@@ -21,10 +21,13 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->RegisterPropertyBoolean('DisplayRemaining', false);
         $this->RegisterPropertyInteger('UpdateInterval', 10);
         $this->RegisterPropertyBoolean('ResendAction', false);
+        $this->RegisterPropertyString('NightMode', 'off');
         $this->RegisterPropertyInteger('NightModeSource', 0);
         $this->RegisterPropertyBoolean('NightModeInverted', false);
         $this->RegisterPropertyInteger('NightModeValue', 30);
         $this->RegisterPropertyInteger('DayModeValue', 100);
+        $this->RegisterPropertyInteger('NightModeSourceInteger', 0);
+        $this->RegisterPropertyInteger('AmbientBrightnessThreshold', 0);
 
         //Registering legacy properties to transfer the data
         $this->RegisterPropertyInteger('InputTriggerID', 0);
@@ -37,12 +40,23 @@ class Treppenhauslichtsteuerung extends IPSModule
         //Variables
         $this->RegisterVariableBoolean('Active', 'Treppenhauslichtsteuerung aktiv', '~Switch');
         $this->EnableAction('Active');
+
+        //Attributes
+        $this->RegisterAttributeBoolean('Migrated', false);
     }
 
     public function ApplyChanges()
     {
         //Never delete this line!
         parent::ApplyChanges();
+
+        if (!$this->ReadAttributeBoolean('Migrated') && $this->ReadPropertyInteger('NightModeSource')) {
+            $this->SetNightMode('boolean');
+            IPS_SetProperty($this->InstanceID, 'NightMode', 'boolean');
+            $this->WriteAttributeBoolean('Migrated', true);
+            IPS_ApplyChanges($this->InstanceID);
+            return;
+        }
 
         //Register variable if enabled
         $this->MaintainVariable('Remaining', $this->Translate('Remaining time'), VARIABLETYPE_STRING, '', 10, $this->ReadPropertyBoolean('DisplayRemaining'));
@@ -143,6 +157,23 @@ class Treppenhauslichtsteuerung extends IPSModule
             ];
         }
 
+        $nightMode = $this->ReadPropertyString('NightMode');
+        $boolVisible = $nightMode == 'boolean';
+        $jsonForm['elements'][3]['items'][1]['visible'] = $boolVisible;
+        $jsonForm['elements'][3]['items'][2]['visible'] = $boolVisible;
+        $jsonForm['elements'][3]['items'][3]['visible'] = $boolVisible;
+        $jsonForm['elements'][3]['items'][4]['visible'] = $boolVisible;
+
+        $intVisible = $nightMode == 'integer';
+        $jsonForm['elements'][3]['items'][5]['visible'] = $intVisible;
+        $jsonForm['elements'][3]['items'][6]['visible'] = $intVisible;
+        $jsonForm['elements'][3]['items'][7]['visible'] = $intVisible;
+        $jsonForm['elements'][3]['items'][8]['visible'] = $intVisible;
+
+        $brightnessVisible = in_array($nightMode, ['boolean', 'integer']);
+        $jsonForm['elements'][3]['items'][9]['visible'] = $brightnessVisible;
+        $jsonForm['elements'][3]['items'][10]['visible'] = $brightnessVisible;
+
         //Set visibility of remaining time options
         $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
 
@@ -242,6 +273,25 @@ class Treppenhauslichtsteuerung extends IPSModule
         $this->SetValue('Remaining', sprintf('%02d:%02d:%02d', ($secondsRemaining / 3600), ($secondsRemaining / 60 % 60), $secondsRemaining % 60));
     }
 
+    public function SetNightMode(string $NightMode)
+    {
+        $boolVisible = $NightMode == 'boolean';
+        $this->UpdateFormField('LabelNightModeSource', 'visible', $boolVisible);
+        $this->UpdateFormField('NightModeSource', 'visible', $boolVisible);
+        $this->UpdateFormField('LabelNightModeSourceInverted', 'visible', $boolVisible);
+        $this->UpdateFormField('NightModeInverted', 'visible', $boolVisible);
+
+        $intVisible = $NightMode == 'integer';
+        $this->UpdateFormField('LabelNightModeSourceInteger', 'visible', $intVisible);
+        $this->UpdateFormField('NightModeSourceInteger', 'visible', $intVisible);
+        $this->UpdateFormField('LabelNightModeSourceIntegerThreshold', 'visible', $intVisible);
+        $this->UpdateFormField('AmbientBrightnessThreshold', 'visible', $intVisible);
+
+        $brightnessVisible = in_array($NightMode, ['boolean', 'integer']);
+        $this->UpdateFormField('NightModeValue', 'visible', $brightnessVisible);
+        $this->UpdateFormField('DayModeValue', 'visible', $brightnessVisible);
+    }
+
     private function GetTriggerStatus($triggerID)
     {
         if (!IPS_VariableExists($triggerID)) {
@@ -303,6 +353,7 @@ class Treppenhauslichtsteuerung extends IPSModule
                         self::switchDevice($outputID, $Value);
                     }
                     break;
+
                 case VARIABLETYPE_INTEGER:
                 case VARIABLETYPE_FLOAT:
                     $dimDevice = function ($Value) use ($outputID, $doResend)
@@ -314,16 +365,38 @@ class Treppenhauslichtsteuerung extends IPSModule
 
                     if ($Value) {
                         //We might need to set a different value if night-mode is in use
-                        if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
-                            && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
-                            $dimDevice($this->ReadPropertyInteger('NightModeValue'));
-                        } else {
-                            $dimDevice($this->ReadPropertyInteger('DayModeValue'));
+                        switch ($this->ReadPropertyString('NightMode')) {
+                            case 'boolean':
+                                if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
+                                && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
+                                    $dimDevice($this->ReadPropertyInteger('NightModeValue'));
+                                } else {
+                                    $dimDevice($this->ReadPropertyInteger('DayModeValue'));
+                                }
+                                break;
+
+                            case 'integer':
+                                if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSourceInteger'))
+                                && (GetValue($this->ReadPropertyInteger('NightModeSourceInteger')) < $this->ReadPropertyInteger('AmbientBrightnessThreshold'))) {
+                                    $dimDevice($this->ReadPropertyInteger('NightModeValue'));
+                                } else {
+                                    $dimDevice($this->ReadPropertyInteger('DayModeValue'));
+                                }
+                                break;
+
+                            case 'off':
+                                $dimDevice(100);
+                                break;
+
+                            default:
+                                //Unsupported. Do nothing
+                                break;
                         }
                     } else {
                         $dimDevice(0);
                     }
                     break;
+
                 default:
                     //Unsupported. Do nothing
             }

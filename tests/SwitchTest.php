@@ -405,6 +405,66 @@ class SwitchTest extends TestCase
         $this->assertEquals(floor(255 / 100 * 30), GetValue($ov_id));
     }
 
+    public function testSwitchDimmerNightModeIntensity(): void
+    {
+        $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
+
+        //Activate THL
+        SetValue(IPS_GetObjectIDByIdent('Active', $iid), true);
+
+        //Create Trigger
+        $tv_id = IPS_CreateVariable(VARIABLETYPE_BOOLEAN);
+
+        //Create Action
+        $scriptID = IPS_CreateScript(0 /* PHP */);
+        IPS_SetScriptContent($scriptID, 'SetValue($_IPS[\'VARIABLE\'], $_IPS[\'VALUE\']);');
+
+        //Create Output
+        $ov_id = IPS_CreateVariable(VARIABLETYPE_INTEGER);
+        IPS_SetVariableCustomProfile($ov_id, '~Intensity.255');
+        IPS_SetVariableCustomAction($ov_id, $scriptID);
+
+        //Setup Trigger and Output
+        IPS_SetProperty($iid, 'InputTriggers', json_encode([[
+            'VariableID' => $tv_id
+        ]]));
+        IPS_SetProperty($iid, 'OutputVariables', json_encode([[
+            'VariableID' => $ov_id
+        ]]));
+
+        //Create Night-Mode intensity variable
+        $nv_id = IPS_CreateVariable(VARIABLETYPE_INTEGER);
+
+        //Set Night Mode to ambient light
+        IPS_SetProperty($iid, 'NightMode', 'integer');
+        IPS_SetProperty($iid, 'NightModeSourceInteger', $nv_id);
+        IPS_SetProperty($iid, 'AmbientBrightnessThreshold', 100);
+
+        //Set ambient light to night
+        SetValue($nv_id, 50);
+
+        IPS_ApplyChanges($iid);
+
+        //Simulate a trigger change
+        $interface = IPS\InstanceManager::getInstanceInterface($iid);
+        $interface->MessageSink(strtotime('01.01.2000'), $tv_id, VM_UPDATE, [true]);
+
+        //The output needs to be at 30%
+        $this->assertEquals(floor(255 / 100 * 30), GetValue($ov_id));
+
+        //Set ambient light to day
+        SetValue($nv_id, 100);
+
+        IPS_ApplyChanges($iid);
+
+        //Simulate a trigger change
+        $interface = IPS\InstanceManager::getInstanceInterface($iid);
+        $interface->MessageSink(strtotime('01.01.2000'), $tv_id, VM_UPDATE, [true]);
+
+        //The output needs to be at 100%
+        $this->assertEquals(round(255 / 100 * 100), GetValue($ov_id));
+    }
+
     public function testSwitchDimmerReversedNightMode(): void
     {
         $iid = IPS_CreateInstance('{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}');
