@@ -79,9 +79,8 @@
                 {
                     "type": "SelectVariable",
                     "name": "NightModeSource",
-                    "caption": "Active (Night Mode)",
-                    "visible": false,
-                    "suffix": "minutes"
+                    "caption": "Day/Night",
+                    "visible": false
                 },
                 {
                     "type": "Label",
@@ -105,8 +104,7 @@
                     "type": "SelectVariable",
                     "name": "NightModeSourceInteger",
                     "visible": false,
-                    "caption": "Active (Night Mode)",
-                    "suffix": "minutes"
+                    "caption": "Ambient Brightness"
                 },
                 {
                     "type": "Label",

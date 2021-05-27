@@ -28,14 +28,15 @@
             "Night/Day Variable": "Nacht-/Tag- Variable",
             "Ambient Brightness Variable": "Umgebungshelligkeitsvariable",
             "Use a boolean variable to determine if the night mode value should be send (only applicable to dimmable devices)": "Benutze eine Boolean Variable, um den Nacht-Modus zu aktivieren/deaktivieren",
-			"Use a Integer variable (ambient brightness) to determine if the night mode value should be send (only applicable to dimmable devices)": "Benutze eine Integer Variable (Umgebungshelligkeit), um den Nacht-Modus zu aktivieren/deaktivieren",
-			"Ambient Brightness Threshold": "Umgebungshelligkeitsschwelle",
-			"Set threshold for the ambient brightness": "Stellen den Schwellenwert für die Umgebungshelligkeit ein",
-            "Active (Night Mode)": "Aktiv (Nacht-Modus)",
+            "Use a Integer variable (ambient brightness) to determine if the night mode value should be send (only applicable to dimmable devices)": "Benutze eine Integer Variable (Umgebungshelligkeit), um den Nacht-Modus zu aktivieren/deaktivieren",
+            "Ambient Brightness Threshold": "Umgebungshelligkeitsschwelle",
+            "Set threshold for the ambient brightness": "Stellen den Schwellenwert für die Umgebungshelligkeit ein",
             "Brightness (Night Mode)": "Helligkeit (Nacht-Modus)",
             "Brightness (Day Mode)": "Helligkeit (Tag-Modus)",
             "Inverted": "Invertiert",
-            "Invert value of night-mode active variable (required if IsDay variable from Location is used)": "Invertiere Wert der Nacht-Modus Aktiv Variable (Erforderlich wenn die Ist-Tag Variable von der Location Instanz verwendet wird)"
+            "Invert value of night-mode active variable (required if IsDay variable from Location is used)": "Invertiere Wert der Nacht-Modus Aktiv Variable (Erforderlich wenn die Ist-Tag Variable von der Location Instanz verwendet wird)",
+            "Day/Night": "Tag/Nacht",
+            "Ambient Brightness": "Umgebungshelligkeit"
         }
     }
 }
