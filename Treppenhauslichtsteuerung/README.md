@@ -42,12 +42,26 @@ Name                            | Beschreibung
 Eingabesensoren                 | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
 Ausgabevariablen                | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden akiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
 Dauer                           | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
-Nacht-Modus (Aktiv)             | Gibt die Variable an, welche angibt, ob der Nacht-Modus aktiv ist. Beispiel ist eine Variable die TRUE geschaltet wird, sobald man schlafen geht.
-Nacht-Modus (Aktiv-Invertieren) | Gibt an, ob der Wert der Nacht-Modus Variable invertiert werden soll. Dies ist notwendig, wenn die Ist-Tag Variable von der Location Instanz verwendet werden soll. Diese ist nämlich FALSE, wenn es Dunkel ist.
-Nacht-Modus (Helligkeit)        | Gibt die Helligkeit in Prozent an, auf die beim Aktivieren geschaltet werden soll.
 Aktion erneut senden            | Wenn ein unzuverlässiges Funk-System verwendet wird, so ist es ggf. erforderlich bei jedem Impuls die Aktion zu senden. Im Normalfall sollte diese Option deaktiviert bleiben, da ständiges senden der Aktion bei Funk-Aktoren ggf. den Duty-Cycle aufbrauchen kann. 
 Restlaufzeit anzeigen           | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
 Aktualisierungsintervall        | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
+Nacht-/Tag-Modus                | Ermöglicht es die gewählten Variablen basiernd auf der Tageszeit, oder der Umgebungshelligkeit auf unterschiedliche Werte zu schalten 
+
+__Nacht-/Tag-Modus - Nacht-/Tag Varaible__
+Name                     | Beschreibung
+-------------------------| ---------------------------------
+Tag/Nacht                | Eine Variable, die angibt ob Nacht oder Tag ist.
+Invertiert               | Gibt an, ob der Wert der Nacht-Modus Variable invertiert werden soll. Dies ist notwendig, wenn die Ist-Tag Variable von der Location Instanz verwendet werden soll. Diese ist nämlich FALSE, wenn es Dunkel ist.
+Helligkeit (Nacht-Modus) | Gibt die Helligkeit in Prozent an, die Nachts geschaltet werden soll.
+Helligkeit (Tag-Modus)   | Gibt die Helligkeit in Prozent an, auf die am Tag geschaltet werden soll.
+
+__Nacht-/Tag-Modus - Umgebungshelligkeitsvariable__
+Name                         | Beschreibung
+---------------------------- | ---------------------------------
+Umgebungshelligkeit          | Die Variable, die als Umgebungshelligkeit genutzt wird.
+Umgebungshelligkeitsschwelle | Der Grenzwert, bei dem zwischen den Werten für Tag und Nacht gewechselt wird.
+Helligkeit (Nacht-Modus)     | Gibt die Helligkeit in Prozent an, die bei Unterschreitung der Helligkeit geschaltet werden soll.
+Helligkeit (Tag-Modus)       | Gibt die Helligkeit in Prozent an, die bei Überschreitung der Helligkeit geschaltet werden soll.
 
 ### 5. Statusvariablen und Profile
 
