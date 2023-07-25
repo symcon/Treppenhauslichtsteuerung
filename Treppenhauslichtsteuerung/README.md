@@ -40,12 +40,12 @@ __Konfigurationsseite__:
 Name                            | Beschreibung
 ------------------------------- | ---------------------------------
 Eingabesensoren                 | Liste der Eingabesensoren, bei deren Aktivierung das Licht aktiviert werden soll, z.B. Bewegungssensoren oder Taster - Das Licht wird aktiviert sobald eine Variable auf aktiv gesetzt wird. Als aktiv gelten hierbei Variablen mit einem Wert, der nicht false, 0, oder "" ist. Sollte die Variable ein .Reversed Profil haben gelten die genannten Werte als aktiv.
-Ausgabevariablen                | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden akiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
+Ausgabevariablen                | Liste der Variablen, welche aktiv, also auf ihren Maximalwert geschaltet werden und das Licht darstellen. Sollte eine Variable ein .Reversed Profil haben wird diese auf den Minimalwert geschaltet. Variablen des Typs String werden nicht geschaltet. Die Variablen werden aktiv geschaltet, wenn ein Sensor aus der Eingabesensor Liste ausgelöst wird.
 Dauer                           | Nachdem die ausgewählte Dauer ohne weitere Auslösung eines Eingabesensors vergeht, wird das Licht deaktiviert.
 Aktion erneut senden            | Wenn ein unzuverlässiges Funk-System verwendet wird, so ist es ggf. erforderlich bei jedem Impuls die Aktion zu senden. Im Normalfall sollte diese Option deaktiviert bleiben, da ständiges senden der Aktion bei Funk-Aktoren ggf. den Duty-Cycle aufbrauchen kann. 
 Restlaufzeit anzeigen           | Wenn aktiv wird die verbleibende Zeit bis zum Ausschalten in einer Variable angezeigt.
 Aktualisierungsintervall        | Das Intervall, in dem die "Restzeit" Variable aktualisiert wird.
-Nacht-/Tag-Modus                | Ermöglicht es die gewählten Variablen basiernd auf der Tageszeit, oder der Umgebungshelligkeit auf unterschiedliche Werte zu schalten 
+Nacht-/Tag-Modus                | Ermöglicht es die gewählten Variablen basierend auf der Tageszeit, oder der Umgebungshelligkeit auf unterschiedliche Werte zu schalten 
 
 __Nacht-/Tag-Modus - Nacht-/Tag Varaible__
 Name                     | Beschreibung
@@ -70,7 +70,7 @@ Helligkeit (Tag-Modus)       | Gibt die Helligkeit in Prozent an, die bei Übers
 Name                       | Typ     | Beschreibung
 -------------------------- | ------- | ---------------------------
 Treppenhaussteuerung aktiv | Boolean | Die Variable gibt an, ob die Treppenhaussteuerung aktiviert ist
-Restzeit                   | String  | Wenn "Restlaufzeit anzeigen" aktiv ist wird hier die verbleibende Zeit bis zum Auschalten angezeigt
+Restzeit                   | String  | Wenn "Restlaufzeit anzeigen" aktiv ist wird hier die verbleibende Zeit bis zum Ausschalten angezeigt
 
 ##### Profile:
 
