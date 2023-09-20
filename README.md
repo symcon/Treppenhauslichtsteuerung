@@ -6,5 +6,5 @@
 
 Folgende Module beinhaltet das Treppenhauslichtsteuerung Repository:
 
-- __Treppenhauslichtsteuerung__ ([Dokumentation](Treppenhauslichtsteuerung))  
+- __Treppenhauslichtsteuerung__ ([Dokumentation](https://www.symcon.de/de/service/dokumentation/modulreferenz/treppenhauslichtsteuerung))  
 	Beim Aktivieren wird das Licht im Treppenhaus eingeschaltet und wird kurz nach Verlassen des Treppenhauses wieder ausgeschaltet.
