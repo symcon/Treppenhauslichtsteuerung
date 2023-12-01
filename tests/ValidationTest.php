@@ -8,8 +8,8 @@ class ValidationTest extends TestCaseSymconValidation
     {
         $this->validateLibrary(__DIR__ . '/..');
     }
-    public function testValidateTreppenhauslichtsteuerungModule(): void
+    public function testValidateStaircaseLightControlsModule(): void
     {
-        $this->validateModule(__DIR__ . '/../Treppenhauslichtsteuerung');
+        $this->validateModule(__DIR__ . '/../StaircaseLightControls');
     }
 }

@@ -36,7 +36,9 @@
             "Inverted": "Invertiert",
             "Invert value of night-mode active variable (required if IsDay variable from Location is used)": "Invertiere Wert der Nacht-Modus Aktiv Variable (Erforderlich wenn die Ist-Tag Variable von der Location Instanz verwendet wird)",
             "Day/Night": "Tag/Nacht",
-            "Ambient Brightness": "Umgebungshelligkeit"
+            "Ambient Brightness": "Umgebungshelligkeit",
+            "Staircase Light Controls": "Treppenhauslichtsteuerung",
+            "https://www.symcon.de/en/service/documentation/module-reference/staircase-light-controls/": "https://www.symcon.de/de/service/dokumentation/modulreferenz/treppenhauslichtsteuerung/"
         }
     }
 }
