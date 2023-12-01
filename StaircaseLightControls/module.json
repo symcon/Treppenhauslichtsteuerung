@@ -1,14 +1,14 @@
 {
     "id": "{9D5546FA-CDB2-49BB-9B1D-F40F21E8219B}",
-    "name": "Treppenhauslichtsteuerung",
+    "name": "Staircase Light Controls",
     "type": 3,
     "vendor": "",
     "aliases": [
-        "Treppenhauslichtsteuerung"
+        "Staircase Light Controls"
     ],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
     "prefix": "THL",
-    "url": "https://github.com/symcon/Treppenhauslichtsteuerung/tree/master/Treppenhauslichtsteuerung"
+    "url": "https://www.symcon.de/en/service/documentation/module-reference/staircase-light-controls/"
 }
