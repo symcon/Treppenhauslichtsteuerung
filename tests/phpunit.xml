@@ -6,7 +6,7 @@
   </php>
   <source>
     <include>
-      <directory suffix=".php">../Treppenhauslichtsteuerung</directory>
+      <directory suffix=".php">../StaircaseLightControls</directory>
     </include>
   </source>
 </phpunit>

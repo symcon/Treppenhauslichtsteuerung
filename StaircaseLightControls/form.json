@@ -60,14 +60,24 @@
             "type": "ExpansionPanel",
             "caption": "Night/Day Mode",
             "items": [
-                { "type": "Select",
-                  "name": "NightMode",
-                  "caption": "Night/Day Mode",
-                  "onChange": "THL_SetNightMode($id,$NightMode);",
-                  "options": [
-                        { "caption": "Off", "value": "off" },
-                        { "caption": "Night/Day Variable", "value": "boolean" },
-                        { "caption": "Ambient Brightness Variable", "value": "integer" }
+                {
+                    "type": "Select",
+                    "name": "NightMode",
+                    "caption": "Night/Day Mode",
+                    "onChange": "THL_SetNightMode($id,$NightMode);",
+                    "options": [
+                        {
+                            "caption": "Off",
+                            "value": "off"
+                        },
+                        {
+                            "caption": "Night/Day Variable",
+                            "value": "boolean"
+                        },
+                        {
+                            "caption": "Ambient Brightness Variable",
+                            "value": "integer"
+                        }
                     ]
                 },
                 {
@@ -118,7 +128,7 @@
                     "visible": false,
                     "caption": "Ambient Brightness Threshold",
                     "suffix": " lux"
-				},
+                },
                 {
                     "type": "NumberSpinner",
                     "name": "NightModeValue",

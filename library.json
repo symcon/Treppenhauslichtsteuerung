@@ -1,12 +1,12 @@
 {
-	"id": "{D793B1C0-2C13-451F-9685-2272B2A5B8E8}",
-	"author": "Symcon GmbH",
-	"name": "Treppenhauslichtsteuerung",
-	"url": "https://www.symcon.de/",
-	"compatibility": {
-		"version": "5.0"
-	},
-	"version": "1.4",
-	"build": 5,
-	"date": 0
+    "id": "{D793B1C0-2C13-451F-9685-2272B2A5B8E8}",
+    "author": "Symcon GmbH",
+    "name": "Staircase Light Controls",
+    "url": "https://www.symcon.de/",
+    "compatibility": {
+        "version": "5.0"
+    },
+    "version": "1.4",
+    "build": 5,
+    "date": 0
 }

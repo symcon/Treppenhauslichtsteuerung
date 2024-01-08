@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 include_once __DIR__ . '/helper/autoload.php';
 
-class Treppenhauslichtsteuerung extends IPSModule
+class StaircaseLightControls extends IPSModule
 {
     use HelperSwitchDevice;
     use HelperDimDevice;
