@@ -209,6 +209,9 @@ class StaircaseLightControls extends IPSModule
         switch ($Ident) {
             case 'Active':
                 $this->SetActive($Value);
+                if (!$Value) {
+                    $this->StopTimer();
+                }
                 break;
             default:
                 throw new Exception('Invalid ident');
@@ -225,14 +228,7 @@ class StaircaseLightControls extends IPSModule
         $this->SetValue('Active', $Value);
     }
 
-    public function Start()
-    {
-        if (!$this->GetValue('Active')) {
-            return;
-        }
-
-        $this->SwitchVariable(true);
-
+    private function StartTimer() {
         //Start OffTimer
         $duration = $this->ReadPropertyInteger('Duration');
         $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
@@ -244,10 +240,17 @@ class StaircaseLightControls extends IPSModule
         }
     }
 
-    public function Stop()
+    public function Start()
     {
-        $this->SwitchVariable(false);
+        if (!$this->GetValue('Active')) {
+            return;
+        }
 
+        $this->SwitchVariable(true);
+        $this->StartTimer();
+    }
+
+    private function StopTimer() {
         //Disable OffTimer
         $this->SetTimerInterval('OffTimer', 0);
 
@@ -256,6 +259,12 @@ class StaircaseLightControls extends IPSModule
             $this->SetTimerInterval('UpdateRemainingTimer', 0);
             $this->SetValue('Remaining', '00:00:00');
         }
+    }
+
+    public function Stop()
+    {
+        $this->SwitchVariable(false);
+        $this->StopTimer();
     }
 
     public function UpdateRemaining()
