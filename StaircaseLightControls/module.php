@@ -228,18 +228,6 @@ class StaircaseLightControls extends IPSModule
         $this->SetValue('Active', $Value);
     }
 
-    private function StartTimer() {
-        //Start OffTimer
-        $duration = $this->ReadPropertyInteger('Duration');
-        $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
-
-        //Update display variable periodically if enabled
-        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
-            $this->SetTimerInterval('UpdateRemainingTimer', 1000 * $this->ReadPropertyInteger('UpdateInterval'));
-            $this->UpdateRemaining();
-        }
-    }
-
     public function Start()
     {
         if (!$this->GetValue('Active')) {
@@ -248,17 +236,6 @@ class StaircaseLightControls extends IPSModule
 
         $this->SwitchVariable(true);
         $this->StartTimer();
-    }
-
-    private function StopTimer() {
-        //Disable OffTimer
-        $this->SetTimerInterval('OffTimer', 0);
-
-        //Disable updating of display variable
-        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
-            $this->SetTimerInterval('UpdateRemainingTimer', 0);
-            $this->SetValue('Remaining', '00:00:00');
-        }
     }
 
     public function Stop()
@@ -299,6 +276,31 @@ class StaircaseLightControls extends IPSModule
         $brightnessVisible = in_array($NightMode, ['boolean', 'integer']);
         $this->UpdateFormField('NightModeValue', 'visible', $brightnessVisible);
         $this->UpdateFormField('DayModeValue', 'visible', $brightnessVisible);
+    }
+
+    private function StartTimer()
+    {
+        //Start OffTimer
+        $duration = $this->ReadPropertyInteger('Duration');
+        $this->SetTimerInterval('OffTimer', $duration * 60 * 1000);
+
+        //Update display variable periodically if enabled
+        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
+            $this->SetTimerInterval('UpdateRemainingTimer', 1000 * $this->ReadPropertyInteger('UpdateInterval'));
+            $this->UpdateRemaining();
+        }
+    }
+
+    private function StopTimer()
+    {
+        //Disable OffTimer
+        $this->SetTimerInterval('OffTimer', 0);
+
+        //Disable updating of display variable
+        if ($this->ReadPropertyBoolean('DisplayRemaining')) {
+            $this->SetTimerInterval('UpdateRemainingTimer', 0);
+            $this->SetValue('Remaining', '00:00:00');
+        }
     }
 
     private function GetTriggerStatus($triggerID)
