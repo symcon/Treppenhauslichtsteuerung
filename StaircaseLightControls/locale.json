@@ -10,7 +10,7 @@
             "The profile of the output variable has no defined max value. Please update the max value or choose another profile.": "Die Ausgabevariable hat keinen definierten Maximalwert. Bitte aktualisieren Sie den Maximalwert oder wählen ein anderes Profil.",
             "The instance is erroneous.": "Die Instanz ist fehlerhaft.",
             "Both lists need to be populated.": "In beiden Listen müssen Variablen vorhanden sein.",
-            "Display remaing time": "Restlaufzeit anzeigen",
+            "Display remaining time": "Restlaufzeit anzeigen",
             "Update Interval": "Aktualisierungsintervall",
             "Seconds": "Sekunden",
             "Remaining time": "Restzeit",
@@ -38,6 +38,10 @@
             "Day/Night": "Tag/Nacht",
             "Ambient Brightness": "Umgebungshelligkeit",
             "Staircase Light Controls": "Treppenhauslichtsteuerung",
+            "Off Action": "Aktion beim Deakivieren",
+            "Switch Off after timeout": "Nach Restlaufzeit ausschalten",
+            "Switch Off immediately": "Sofort ausschalten",
+            "Just disable timeout timer": "Nur Restlaufzeit Timer deaktivieren",
             "https://www.symcon.de/en/service/documentation/module-reference/staircase-light-controls/": "https://www.symcon.de/de/service/dokumentation/modulreferenz/treppenhauslichtsteuerung/"
         }
     }

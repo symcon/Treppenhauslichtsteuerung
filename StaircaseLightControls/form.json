@@ -57,6 +57,25 @@
             "suffix": "minutes"
         },
         {
+            "type": "Select",
+            "name": "OffAction",
+            "caption": "Off Action",
+            "options": [
+                {
+                    "caption": "Switch Off after timeout",
+                    "value": 0
+                },
+                {
+                    "caption": "Switch Off immediately",
+                    "value": 1
+                },
+                {
+                    "caption": "Just disable timeout timer",
+                    "value": 2
+                }
+            ]
+        },
+        {
             "type": "ExpansionPanel",
             "caption": "Night/Day Mode",
             "items": [
@@ -157,7 +176,7 @@
         {
             "type": "CheckBox",
             "name": "DisplayRemaining",
-            "caption": "Display remaing time",
+            "caption": "Display remaining time",
             "onChange": "THL_ToggleDisplayInterval($id, $DisplayRemaining);"
         },
         {

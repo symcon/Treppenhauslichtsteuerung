@@ -28,6 +28,7 @@ class StaircaseLightControls extends IPSModule
         $this->RegisterPropertyInteger('DayModeValue', 100);
         $this->RegisterPropertyInteger('NightModeSourceInteger', 0);
         $this->RegisterPropertyInteger('AmbientBrightnessThreshold', 0);
+        $this->RegisterPropertyInteger('OffAction', 0);
 
         //Registering legacy properties to transfer the data
         $this->RegisterPropertyInteger('InputTriggerID', 0);
@@ -159,23 +160,23 @@ class StaircaseLightControls extends IPSModule
 
         $nightMode = $this->ReadPropertyString('NightMode');
         $boolVisible = $nightMode == 'boolean';
-        $jsonForm['elements'][3]['items'][1]['visible'] = $boolVisible;
-        $jsonForm['elements'][3]['items'][2]['visible'] = $boolVisible;
-        $jsonForm['elements'][3]['items'][3]['visible'] = $boolVisible;
-        $jsonForm['elements'][3]['items'][4]['visible'] = $boolVisible;
+        $jsonForm['elements'][4]['items'][1]['visible'] = $boolVisible;
+        $jsonForm['elements'][4]['items'][2]['visible'] = $boolVisible;
+        $jsonForm['elements'][4]['items'][3]['visible'] = $boolVisible;
+        $jsonForm['elements'][4]['items'][4]['visible'] = $boolVisible;
 
         $intVisible = $nightMode == 'integer';
-        $jsonForm['elements'][3]['items'][5]['visible'] = $intVisible;
-        $jsonForm['elements'][3]['items'][6]['visible'] = $intVisible;
-        $jsonForm['elements'][3]['items'][7]['visible'] = $intVisible;
-        $jsonForm['elements'][3]['items'][8]['visible'] = $intVisible;
+        $jsonForm['elements'][4]['items'][5]['visible'] = $intVisible;
+        $jsonForm['elements'][4]['items'][6]['visible'] = $intVisible;
+        $jsonForm['elements'][4]['items'][7]['visible'] = $intVisible;
+        $jsonForm['elements'][4]['items'][8]['visible'] = $intVisible;
 
         $brightnessVisible = in_array($nightMode, ['boolean', 'integer']);
-        $jsonForm['elements'][3]['items'][9]['visible'] = $brightnessVisible;
-        $jsonForm['elements'][3]['items'][10]['visible'] = $brightnessVisible;
+        $jsonForm['elements'][4]['items'][9]['visible'] = $brightnessVisible;
+        $jsonForm['elements'][4]['items'][10]['visible'] = $brightnessVisible;
 
         //Set visibility of remaining time options
-        $jsonForm['elements'][7]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
+        $jsonForm['elements'][8]['visible'] = $this->ReadPropertyBoolean('DisplayRemaining');
 
         return json_encode($jsonForm);
     }
@@ -210,7 +211,16 @@ class StaircaseLightControls extends IPSModule
             case 'Active':
                 $this->SetActive($Value);
                 if (!$Value) {
-                    $this->StopTimer();
+                    switch ($this->ReadPropertyInteger('OffAction')) {
+                        case 0: // Switch Off after timeout
+                            break;
+                        case 1: // Switch Off immediately
+                            $this->Stop();
+                            break;
+                        case 2: // Just disable timeout timer
+                            $this->StopTimer();
+                            break;
+                    }
                 }
                 break;
             default:
