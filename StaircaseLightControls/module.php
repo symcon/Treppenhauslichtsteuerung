@@ -367,59 +367,59 @@ class StaircaseLightControls extends IPSModule
                 }
             }
 
-            //Depending on the type we need to switch differently
-            switch (IPS_GetVariable($outputID)['VariableType']) {
-                case VARIABLETYPE_BOOLEAN:
-                    if ($doResend || (self::getSwitchValue($outputID) != $Value)) {
-                        self::switchDevice($outputID, $Value);
-                    }
-                    break;
-
-                case VARIABLETYPE_INTEGER:
-                case VARIABLETYPE_FLOAT:
-                    $dimDevice = function ($Value) use ($outputID, $doResend)
-                    {
+            $setDevice = function ($Value) use ($outputID, $doResend)
+            {
+                //Depending on the type we need to switch differently
+                switch (IPS_GetVariable($outputID)['VariableType']) {
+                    case VARIABLETYPE_BOOLEAN:
+                        if ($doResend || (self::getSwitchValue($outputID) != $Value)) {
+                            self::switchDevice($outputID, $Value);
+                        }
+                        break;
+                    case VARIABLETYPE_INTEGER:
+                    case VARIABLETYPE_FLOAT:
                         if ($doResend || (self::getDimValue($outputID) != $Value)) {
                             self::dimDevice($outputID, $Value);
                         }
-                    };
+                        break;
 
-                    if ($Value) {
-                        //We might need to set a different value if night-mode is in use
-                        switch ($this->ReadPropertyString('NightMode')) {
-                            case 'boolean':
-                                if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
-                                && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
-                                    $dimDevice($this->ReadPropertyInteger('NightModeValue'));
-                                } else {
-                                    $dimDevice($this->ReadPropertyInteger('DayModeValue'));
-                                }
-                                break;
+                    default:
+                        //Unsupported. Do nothing
+                        break;
+                }
+            };
 
-                            case 'integer':
-                                if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSourceInteger'))
-                                && (GetValue($this->ReadPropertyInteger('NightModeSourceInteger')) < $this->ReadPropertyInteger('AmbientBrightnessThreshold'))) {
-                                    $dimDevice($this->ReadPropertyInteger('NightModeValue'));
-                                } else {
-                                    $dimDevice($this->ReadPropertyInteger('DayModeValue'));
-                                }
-                                break;
-
-                            case 'off':
-                                $dimDevice(100);
-                                break;
-
-                            default:
-                                //Unsupported. Do nothing
-                                break;
+            if ($Value) {
+                //We might need to set a different value if night-mode is in use
+                switch ($this->ReadPropertyString('NightMode')) {
+                    case 'boolean':
+                        if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
+                        && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
+                            $setDevice($this->ReadPropertyInteger('NightModeValue'));
+                        } else {
+                            $setDevice($this->ReadPropertyInteger('DayModeValue'));
                         }
-                    } else {
-                        $dimDevice(0);
-                    }
-                    break;
+                        break;
 
-                default:
-                    //Unsupported. Do nothing
+                    case 'integer':
+                        if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSourceInteger'))
+                        && (GetValue($this->ReadPropertyInteger('NightModeSourceInteger')) < $this->ReadPropertyInteger('AmbientBrightnessThreshold'))) {
+                            $setDevice($this->ReadPropertyInteger('NightModeValue'));
+                        } else {
+                            $setDevice($this->ReadPropertyInteger('DayModeValue'));
+                        }
+                        break;
+
+                    case 'off':
+                        $setDevice(100);
+                        break;
+
+                    default:
+                        //Unsupported. Do nothing
+                        break;
+                }
+            } else {
+                $setDevice(0);
             }
         }
     }
