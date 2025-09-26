@@ -400,10 +400,10 @@ class StaircaseLightControls extends IPSModule
                     case 'boolean':
                         if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
                             && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
-                            $this->SendDebug('Night Mode Value', $this->ReadPropertyInteger('NightModeValue'), 0);
+                            $this->SendDebug('Night Mode Value', strval($this->ReadPropertyInteger('NightModeValue')), 0);
                             $setDevice($this->ReadPropertyInteger('NightModeValue'));
                         } else {
-                            $this->SendDebug('Day Mode Value', $this->ReadPropertyInteger('DayModeValue'), 0);
+                            $this->SendDebug('Day Mode Value', strval($this->ReadPropertyInteger('DayModeValue')), 0);
                             $setDevice($this->ReadPropertyInteger('DayModeValue'));
                         }
                         break;
