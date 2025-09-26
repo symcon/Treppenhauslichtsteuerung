@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 include_once __DIR__ . '/helper/autoload.php';
+include_once __DIR__ . '/simulate.php';
 
 class StaircaseLightControls extends IPSModule
 {
     use HelperSwitchDevice;
     use HelperDimDevice;
+    use Simulate;
 
     public function Create()
     {
