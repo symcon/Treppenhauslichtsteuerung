@@ -241,13 +241,14 @@ class StaircaseLightControls extends IPSModule
     public function Start()
     {
         if (!$this->GetValue('Active')) {
+            $this->SendDebug('Status', 'Not Active', 0);
             return;
         }
-
+        $this->SendDebug('Status', 'Start Switching', 0);
         $this->SwitchVariable(true);
         $this->StartTimer();
     }
-
+    
     public function Stop()
     {
         $this->SwitchVariable(false);
@@ -373,13 +374,15 @@ class StaircaseLightControls extends IPSModule
                 switch (IPS_GetVariable($outputID)['VariableType']) {
                     case VARIABLETYPE_BOOLEAN:
                         if ($doResend || (self::getSwitchValue($outputID) != $Value)) {
+                            $this->SendDebug("Switch Variable", IPS_GetName($outputID) . "($outputID) -> $Value", 0);
                             self::switchDevice($outputID, $Value);
                         }
                         break;
-                    case VARIABLETYPE_INTEGER:
-                    case VARIABLETYPE_FLOAT:
-                        if ($doResend || (self::getDimValue($outputID) != $Value)) {
-                            self::dimDevice($outputID, $Value);
+                        case VARIABLETYPE_INTEGER:
+                        case VARIABLETYPE_FLOAT:
+                            if ($doResend || (self::getDimValue($outputID) != $Value)) {
+                                $this->SendDebug("Switch Variable", IPS_GetName($outputID) . "($outputID) -> $Value", 0);
+                                self::dimDevice($outputID, $Value);
                         }
                         break;
 
@@ -391,12 +394,16 @@ class StaircaseLightControls extends IPSModule
 
             if ($Value) {
                 //We might need to set a different value if night-mode is in use
+                $this->SendDebug('Night Mode', $this->ReadPropertyString('NightMode'), 0);
+                
                 switch ($this->ReadPropertyString('NightMode')) {
                     case 'boolean':
                         if (IPS_VariableExists($this->ReadPropertyInteger('NightModeSource'))
-                        && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
+                            && (GetValue($this->ReadPropertyInteger('NightModeSource')) ^ $this->ReadPropertyBoolean('NightModeInverted'))) {
+                            $this->SendDebug('Night Mode Value', $this->ReadPropertyInteger('NightModeValue'), 0);
                             $setDevice($this->ReadPropertyInteger('NightModeValue'));
                         } else {
+                            $this->SendDebug('Day Mode Value', $this->ReadPropertyInteger('DayModeValue'), 0);
                             $setDevice($this->ReadPropertyInteger('DayModeValue'));
                         }
                         break;
